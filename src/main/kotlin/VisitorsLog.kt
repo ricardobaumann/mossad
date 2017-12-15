@@ -2,6 +2,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.jackson.responseObject
 import com.github.kittinunf.result.Result
+import redis.clients.jedis.Jedis
 import java.util.*
 import java.util.stream.Collectors
 
@@ -12,7 +13,7 @@ val visitorsLogPiwikUrl = "https://piwik-admin.up.welt.de/index.php?module=API&m
 private fun String.extractContentId(): String {
     val parts = this.split("/")
     if (parts.size < 2) {
-        return this;
+        return this
     }
     return parts[parts.size - 2].replace("article", "").replace("video", "")
 }
@@ -21,7 +22,9 @@ private fun String.isNumeric(): Boolean {
     return this.toIntOrNull() != null
 }
 
-private val graph = HashMap<String, MutableSet<String>>()
+private val fromToIds = HashMap<String, MutableSet<String>>()
+
+private val jedis = Jedis()
 
 fun main(args: Array<String>) {
     var offset = 0
@@ -37,7 +40,7 @@ fun main(args: Array<String>) {
                 is Result.Success -> {
                     val resultArray = result.get()
                     if (resultArray.any()) {
-                        parseResult(resultArray)
+                        extractRelations(resultArray)
                     } else {
                         break@loop
                     }
@@ -51,11 +54,17 @@ fun main(args: Array<String>) {
         }
         offset += pageSize
     }
-    graph.entries.stream().forEach { t -> println("${t.key} = ${t.value}") }
+    val pipeline = jedis.pipelined()
+    fromToIds.entries.stream().forEach { t ->
+        println("${t.key} = ${t.value}")
+        pipeline.set(t.key, t.value.toJsonString())
+        println(jedis.get(t.key))
+    }
+    pipeline.sync()
 
 }
 
-fun parseResult(resultArray: ArrayNode) {
+private fun extractRelations(resultArray: ArrayNode) {
     resultArray.stream()
             .map { visit -> visit["actionDetails"] as ArrayNode }
             .map { actionDetails ->
@@ -71,7 +80,7 @@ fun parseResult(resultArray: ArrayNode) {
                 ids.forEach { key ->
                     val value = ids.stream().filter { it != key }.collect(Collectors.toSet())
                     if (value.isNotEmpty()) {
-                        graph.getOrPut(key, { value }).addAll(value)
+                        fromToIds.getOrPut(key, { value }).addAll(value)
                     }
                 }
 
