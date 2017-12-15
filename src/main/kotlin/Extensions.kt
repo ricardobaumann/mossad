@@ -10,6 +10,6 @@ fun ArrayNode.stream(): Stream<JsonNode> {
 
 private val objectMapper = ObjectMapper()
 
-fun <E> MutableSet<E>.toJsonString(): String {
+fun <E> MutableList<E>.toJsonString(): String {
     return objectMapper.writeValueAsString(this)
 }

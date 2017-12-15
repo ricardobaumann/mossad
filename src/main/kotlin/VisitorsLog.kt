@@ -6,7 +6,9 @@ import redis.clients.jedis.Jedis
 import java.util.*
 import java.util.stream.Collectors
 
-val pageSize = 200
+val pageSize = 1000
+
+val maxPages = 2
 
 val visitorsLogPiwikUrl = "https://piwik-admin.up.welt.de/index.php?module=API&method=Live.getLastVisitsDetails&format=JSON&idSite=1&period=day&date=today&expanded=1&token_auth=325b6226f6b06472e78e6da694999486&filter_limit=$pageSize"
 
@@ -22,20 +24,21 @@ private fun String.isNumeric(): Boolean {
     return this.toIntOrNull() != null
 }
 
-private val fromToIds = HashMap<String, MutableSet<String>>()
+private val fromToIds = HashMap<String, MutableList<String>>()
 
-private val jedis = Jedis()
+private val jedis = Jedis("localhost", 32771)
 
 fun main(args: Array<String>) {
-    var offset = 0
-    loop@ while (true) {
+    var page = 0
+    loop@ while (page < maxPages) {
         try {
-            println("Fetching offset $offset")
+            println("Fetching page $page")
+            val offset = page * pageSize
             val (_, _, result) = (visitorsLogPiwikUrl + "&filter_offset=$offset")
                     .httpGet().responseObject<ArrayNode>()
             when (result) {
                 is Result.Failure -> {
-                    break@loop
+                    println(result.error)
                 }
                 is Result.Success -> {
                     val resultArray = result.get()
@@ -52,13 +55,21 @@ fun main(args: Array<String>) {
             println("Exiting due to $e")
             break@loop
         }
-        offset += pageSize
+        page += 1
     }
     val pipeline = jedis.pipelined()
     fromToIds.entries.stream().forEach { t ->
-        println("${t.key} = ${t.value}")
-        pipeline.set(t.key, t.value.toJsonString())
-        println(jedis.get(t.key))
+
+        val top10Ocurrences = t.value
+                .stream().collect(Collectors.groupingBy({ w -> w }, Collectors.counting()))
+                .entries.stream()
+                .sorted(Comparator.comparingInt<MutableMap.MutableEntry<Any?, Long>> { value -> value.value.toInt() }
+                        .reversed()).limit(10).map { it.key }.collect(Collectors.toList())
+
+        pipeline.set(t.key, top10Ocurrences.toJsonString())
+        //println("${t.key} = ${t.value}")
+        println("${t.key} = $top10Ocurrences")
+        //println(jedis.get(t.key))
     }
     pipeline.sync()
 
@@ -78,7 +89,7 @@ private fun extractRelations(resultArray: ArrayNode) {
                         .filter { it.isNumeric() }.collect(Collectors.toList())
 
                 ids.forEach { key ->
-                    val value = ids.stream().filter { it != key }.collect(Collectors.toSet())
+                    val value = ids.stream().filter { it != key }.collect(Collectors.toList())
                     if (value.isNotEmpty()) {
                         fromToIds.getOrPut(key, { value }).addAll(value)
                     }
