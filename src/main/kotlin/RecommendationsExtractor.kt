@@ -29,7 +29,6 @@ fun feedRecommendations() {
     var page = 0
     loop@ while (page < maxPages) {
         try {
-            println("Fetching page $page")
             val offset = page * pageSize
             val (_, _, result) = (visitorsLogPiwikUrl + "&filter_offset=$offset")
                     .httpGet().responseObject<ArrayNode>()
@@ -49,7 +48,7 @@ fun feedRecommendations() {
                 }
             }
         } catch (e: Exception) {
-            println("Exiting due to $e")
+            logger.error(e) { "Exiting due to $e" }
             break@loop
         }
         page += 1

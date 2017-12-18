@@ -26,17 +26,17 @@ dependencies {
 
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
-    // https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-lambda
     compile group: 'com.amazonaws', name: 'aws-java-sdk-lambda', version: '1.11.246'
 
-    // https://mvnrepository.com/artifact/com.amazonaws/aws-lambda-java-events
     compile group: 'com.amazonaws', name: 'aws-lambda-java-events', version: '2.0.2'
 
     compile 'com.github.kittinunf.fuel:fuel-jackson:1.12.0'
 
-    // https://mvnrepository.com/artifact/redis.clients/jedis
     compile group: 'redis.clients', name: 'jedis', version: '2.9.0'
-    
+
+    compile 'org.slf4j:slf4j-simple:1.7.25'
+    compile 'io.github.microutils:kotlin-logging:1.4.7'
+
     compile "com.sparkjava:spark-kotlin:1.0.0-alpha"
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
