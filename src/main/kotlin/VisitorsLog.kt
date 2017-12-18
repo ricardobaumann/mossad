@@ -6,9 +6,9 @@ import redis.clients.jedis.Jedis
 import java.util.*
 import java.util.stream.Collectors
 
-val pageSize = 1000
+val pageSize = 500
 
-val maxPages = 2
+val maxPages = 200
 
 val visitorsLogPiwikUrl = "https://piwik-admin.up.welt.de/index.php?module=API&method=Live.getLastVisitsDetails&format=JSON&idSite=1&period=day&date=today&expanded=1&token_auth=325b6226f6b06472e78e6da694999486&filter_limit=$pageSize"
 
@@ -60,16 +60,16 @@ fun main(args: Array<String>) {
     val pipeline = jedis.pipelined()
     fromToIds.entries.stream().forEach { t ->
 
-        val top10Ocurrences = t.value
+        val mostHit = t.value
                 .stream().collect(Collectors.groupingBy({ w -> w }, Collectors.counting()))
                 .entries.stream()
                 .sorted(Comparator.comparingInt<MutableMap.MutableEntry<Any?, Long>> { value -> value.value.toInt() }
-                        .reversed()).limit(10).map { it.key }.collect(Collectors.toList())
+                        .reversed())
+                .limit(10).map { it.key }
+                .collect(Collectors.toList())
 
-        pipeline.set(t.key, top10Ocurrences.toJsonString())
-        //println("${t.key} = ${t.value}")
-        println("${t.key} = $top10Ocurrences")
-        //println(jedis.get(t.key))
+        pipeline.set(t.key, mostHit.toJsonString())
+        println("${t.key} = $mostHit")
     }
     pipeline.sync()
 

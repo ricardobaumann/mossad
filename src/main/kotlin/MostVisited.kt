@@ -9,7 +9,7 @@ import java.util.regex.Pattern
 import java.util.stream.Stream
 import java.util.stream.StreamSupport
 
-private val piwikMostVisitedUrl: String = "https://piwik-admin.up.welt.de/index.php?module=API&method=Actions.getEntryPageUrls&format=JSON&idSite=1&period=day&date=2017-12-12&expanded=1&token_auth=325b6226f6b06472e78e6da694999486&filter_limit=100"
+private val piwikMostVisitedUrl: String = "https://piwik-admin.up.welt.de/index.php?module=API&method=Actions.getEntryPageUrls&format=JSON&idSite=1&period=day&date=today&expanded=1&token_auth=325b6226f6b06472e78e6da694999486&filter_limit=100"
 
 data class Content(val section: String, val id: String, val visits: Int)
 
