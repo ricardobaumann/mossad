@@ -36,6 +36,8 @@ dependencies {
 
     // https://mvnrepository.com/artifact/redis.clients/jedis
     compile group: 'redis.clients', name: 'jedis', version: '2.9.0'
+    
+    compile "com.sparkjava:spark-kotlin:1.0.0-alpha"
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }

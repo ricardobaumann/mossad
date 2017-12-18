@@ -2,15 +2,14 @@ import com.fasterxml.jackson.databind.node.ArrayNode
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.jackson.responseObject
 import com.github.kittinunf.result.Result
-import redis.clients.jedis.Jedis
 import java.util.*
 import java.util.stream.Collectors
 
-val pageSize = 500
+private val pageSize = 500
 
-val maxPages = 200
+private val maxPages = 10
 
-val visitorsLogPiwikUrl = "https://piwik-admin.up.welt.de/index.php?module=API&method=Live.getLastVisitsDetails&format=JSON&idSite=1&period=day&date=today&expanded=1&token_auth=325b6226f6b06472e78e6da694999486&filter_limit=$pageSize"
+private val visitorsLogPiwikUrl = "$piwikBaseUrl?module=API&method=Live.getLastVisitsDetails&format=JSON&idSite=1&period=day&date=today&expanded=1&token_auth=325b6226f6b06472e78e6da694999486&filter_limit=$pageSize"
 
 private fun String.extractContentId(): String {
     val parts = this.split("/")
@@ -20,15 +19,13 @@ private fun String.extractContentId(): String {
     return parts[parts.size - 2].replace("article", "").replace("video", "")
 }
 
-private fun String.isNumeric(): Boolean {
-    return this.toIntOrNull() != null
-}
-
-private val fromToIds = HashMap<String, MutableList<String>>()
-
-private val jedis = Jedis("localhost", 32771)
 
 fun main(args: Array<String>) {
+    feedRecommendations()
+}
+
+fun feedRecommendations() {
+    val fromToIds = HashMap<String, MutableList<String>>()
     var page = 0
     loop@ while (page < maxPages) {
         try {
@@ -43,7 +40,7 @@ fun main(args: Array<String>) {
                 is Result.Success -> {
                     val resultArray = result.get()
                     if (resultArray.any()) {
-                        extractRelations(resultArray)
+                        extractRelations(resultArray, fromToIds)
                     } else {
                         break@loop
                     }
@@ -72,10 +69,9 @@ fun main(args: Array<String>) {
         println("${t.key} = $mostHit")
     }
     pipeline.sync()
-
 }
 
-private fun extractRelations(resultArray: ArrayNode) {
+private fun extractRelations(resultArray: ArrayNode, fromToIds: HashMap<String, MutableList<String>>) {
     resultArray.stream()
             .map { visit -> visit["actionDetails"] as ArrayNode }
             .map { actionDetails ->
