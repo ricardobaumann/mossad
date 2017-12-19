@@ -131,7 +131,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/mossad/dev/1513682215095-2017-12-19T11:16:55.095Z/mossad-1.0-SNAPSHOT.zip"
+                "S3Key": "serverless/mossad/dev/1513690434566-2017-12-19T13:33:54.566Z/mossad-1.0-SNAPSHOT.zip"
               },
               "FunctionName": "mossad-dev-wstester",
               "Handler": "mossad.GetHandler",
@@ -162,14 +162,14 @@
               "IamRoleLambdaExecution"
             ]
           },
-          "WstesterLambdaVersionqqc4KixQ5sU3B6i7d2Q0r3m3HD1Z3vBdcGjZRedVu4": {
+          "WstesterLambdaVersiond3MqKvT3Zh9jKVzxLJ9jSPv2aMCVGnbNoq0lPZM": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "WstesterLambdaFunction"
               },
-              "CodeSha256": "qqc4KixQ5sU3B6i7d2Q/0r3m3HD1Z3vBdcGjZRedVu4="
+              "CodeSha256": "d3MqKvT/3Zh9jKVzxL+J9jSPv2aMCVGnbN+oq/0lPZM="
             }
           },
           "ApiGatewayRestApi": {
@@ -178,7 +178,7 @@
               "Name": "dev-mossad"
             }
           },
-          "ApiGatewayResourceTest": {
+          "ApiGatewayResourceContent": {
             "Type": "AWS::ApiGateway::Resource",
             "Properties": {
               "ParentId": {
@@ -187,19 +187,45 @@
                   "RootResourceId"
                 ]
               },
-              "PathPart": "test",
+              "PathPart": "content",
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
               }
             }
           },
-          "ApiGatewayMethodTestGet": {
+          "ApiGatewayResourceContentIdVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceContent"
+              },
+              "PathPart": "{id}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceContentIdVarRecommendations": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceContentIdVar"
+              },
+              "PathPart": "recommendations",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodContentIdVarRecommendationsGet": {
             "Type": "AWS::ApiGateway::Method",
             "Properties": {
               "HttpMethod": "GET",
-              "RequestParameters": {},
+              "RequestParameters": {
+                "method.request.path.id": true
+              },
               "ResourceId": {
-                "Ref": "ApiGatewayResourceTest"
+                "Ref": "ApiGatewayResourceContentIdVarRecommendations"
               },
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
@@ -231,7 +257,7 @@
               "MethodResponses": []
             }
           },
-          "ApiGatewayDeployment1513682215147": {
+          "ApiGatewayDeployment1513690434619": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -240,7 +266,7 @@
               "StageName": "dev"
             },
             "DependsOn": [
-              "ApiGatewayMethodTestGet"
+              "ApiGatewayMethodContentIdVarRecommendationsGet"
             ]
           },
           "WstesterLambdaPermissionApiGateway": {
@@ -362,7 +388,7 @@
           "WstesterLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "WstesterLambdaVersionqqc4KixQ5sU3B6i7d2Q0r3m3HD1Z3vBdcGjZRedVu4"
+              "Ref": "WstesterLambdaVersiond3MqKvT3Zh9jKVzxLJ9jSPv2aMCVGnbNoq0lPZM"
             }
           },
           "ServiceEndpoint": {
@@ -419,8 +445,13 @@
         "events": [
           {
             "http": {
-              "path": "test",
+              "path": "content/{id}/recommendations",
               "method": "get",
+              "request": {
+                "parameters": {
+                  "method.request.path.id": true
+                }
+              },
               "integration": "AWS_PROXY"
             }
           }
@@ -512,7 +543,7 @@
     }
   },
   "package": {
-    "artifactDirectoryName": "serverless/mossad/dev/1513682215095-2017-12-19T11:16:55.095Z",
+    "artifactDirectoryName": "serverless/mossad/dev/1513690434566-2017-12-19T13:33:54.566Z",
     "artifact": "mossad-1.0-SNAPSHOT.zip"
   }
 }

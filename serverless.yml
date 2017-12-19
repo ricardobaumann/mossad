@@ -54,8 +54,12 @@ functions:
         - Ref: ServerlessSubnet
     events:
       - http:
-          path: test
+          path: content/{id}/recommendations
           method: get
+          request:
+            parameters:
+              paths:
+                id: true
 
 resources:
   Resources:

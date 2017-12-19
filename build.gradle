@@ -29,12 +29,10 @@ sourceSets {
 
 dependencies {
 
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    //compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     compile 'com.amazonaws:aws-lambda-java-core:1.1.0'
     compile 'com.amazonaws:aws-lambda-java-events:1.1.0'
-    compile 'com.amazonaws:aws-java-sdk-polly:1.11.214'
-    compile 'com.amazonaws:aws-java-sdk-s3:1.11.214'
 
     compile 'com.github.kittinunf.fuel:fuel-jackson:1.12.0'
 
