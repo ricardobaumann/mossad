@@ -46,7 +46,7 @@ fun feedRecommendations() {
             try {
                 val offset = page * pageSize
                 val (_, _, result) = ("$visitorsLogPiwikUrl&filter_offset=$offset")
-                        .httpGet().timeoutRead(60000).responseObject<ArrayNode>()
+                        .httpGet().timeout(60000).timeoutRead(60000).responseObject<ArrayNode>()
                 when (result) {
                     is Result.Failure -> {
                         println("Failed to read piwik results due to ${result.error}")
