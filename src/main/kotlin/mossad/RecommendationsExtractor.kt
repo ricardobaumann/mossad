@@ -4,14 +4,22 @@ import com.fasterxml.jackson.databind.node.ArrayNode
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.jackson.responseObject
 import com.github.kittinunf.result.Result
+import java.time.LocalDateTime
 import java.util.*
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Executors
+import java.util.function.Supplier
 import java.util.stream.Collectors
+import java.util.stream.IntStream
+import kotlin.system.exitProcess
 
 private val pageSize = 500
 
-private val maxPages = 10
+private val maxPages = 30
 
 private val visitorsLogPiwikUrl = "$piwikBaseUrl?module=API&method=Live.getLastVisitsDetails&format=JSON&idSite=1&period=day&date=today&expanded=1&token_auth=325b6226f6b06472e78e6da694999486&filter_limit=${pageSize}"
+
+private val threadPool = Executors.newFixedThreadPool(maxPages)
 
 private fun String.extractContentId(): String {
     val parts = this.split("/")
@@ -23,39 +31,42 @@ private fun String.extractContentId(): String {
 
 
 fun main(args: Array<String>) {
+    println("Started at ${LocalDateTime.now()}")
     feedRecommendations()
+    println("Finished at ${LocalDateTime.now()}")
+    exitProcess(0)
 }
 
 fun feedRecommendations() {
     val fromToIds = HashMap<String, MutableList<String>>()
-    jedis.set("test", "test")
-    var page = 0
-    loop@ while (page < maxPages) {
-        try {
-            val offset = page * pageSize
-            val (_, _, result) = (visitorsLogPiwikUrl + "&filter_offset=$offset")
-                    .httpGet().responseObject<ArrayNode>()
-            when (result) {
-                is Result.Failure -> {
-                    println(result.error)
-                }
-                is Result.Success -> {
-                    val resultArray = result.get()
-                    if (resultArray.any()) {
-                        extractRelations(resultArray, fromToIds)
-                    } else {
-                        break@loop
+    val emptyResponse = objectMapper.createArrayNode()
+    IntStream.rangeClosed(0, maxPages).mapToObj { page ->
+        CompletableFuture.supplyAsync(Supplier {
+            try {
+                val offset = page * pageSize
+                val (_, _, result) = ("$visitorsLogPiwikUrl&filter_offset=$offset")
+                        .httpGet().responseObject<ArrayNode>()
+                when (result) {
+                    is Result.Failure -> {
+                        println("Failed to read piwik results due to ${result.error}")
+                        emptyResponse
                     }
+                    is Result.Success -> {
+                        println("Page $page processed successfully")
+                        result.get()
 
 
+                    }
                 }
+            } catch (e: Exception) {
+                println("Failed to process page: $e")
+                emptyResponse
             }
-        } catch (e: Exception) {
-            println("Exiting due to an $e")
-            break@loop
-        }
-        page += 1
-    }
+
+        }, threadPool)
+
+    }.map { it.join() }.forEach { extractRelations(it, fromToIds) }
+    //threadPool.awaitTermination(timeoutInMillis.toLong(), TimeUnit.MILLISECONDS)
     val pipeline = jedis.pipelined()
     fromToIds.entries.stream().forEach { t ->
 
@@ -68,7 +79,6 @@ fun feedRecommendations() {
                 .collect(Collectors.toList())
 
         pipeline.set(t.key, mostHit.toJsonString())
-        println("${t.key} = $mostHit")
     }
     pipeline.sync()
 }

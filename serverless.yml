@@ -44,7 +44,7 @@ package:
   artifact: build/distributions/mossad-1.0-SNAPSHOT.zip
 
 functions:
-  wstester:
+  get:
     handler: mossad.GetHandler
     timeout: 30
     vpc:
@@ -60,6 +60,14 @@ functions:
             parameters:
               paths:
                 id: true
+
+  extract:
+    handler: mossad.Reindex
+    timeout: 300
+    events:
+      - schedule:
+         rate: rate(30 minutes)
+         enabled: false
 
 resources:
   Resources:

@@ -5,10 +5,16 @@
     "ServerlessDeploymentBucket": {
       "Type": "AWS::S3::Bucket"
     },
-    "WstesterLogGroup": {
+    "GetLogGroup": {
       "Type": "AWS::Logs::LogGroup",
       "Properties": {
-        "LogGroupName": "/aws/lambda/mossad-dev-wstester"
+        "LogGroupName": "/aws/lambda/mossad-dev-get"
+      }
+    },
+    "ExtractLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/mossad-dev-extract"
       }
     },
     "IamRoleLambdaExecution": {
@@ -52,7 +58,10 @@
                   ],
                   "Resource": [
                     {
-                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mossad-dev-wstester:*"
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mossad-dev-get:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mossad-dev-extract:*"
                     }
                   ]
                 },
@@ -63,7 +72,10 @@
                   ],
                   "Resource": [
                     {
-                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mossad-dev-wstester:*:*"
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mossad-dev-get:*:*"
+                    },
+                    {
+                      "Fn::Sub": "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/mossad-dev-extract:*:*"
                     }
                   ]
                 },
@@ -97,16 +109,16 @@
         ]
       }
     },
-    "WstesterLambdaFunction": {
+    "GetLambdaFunction": {
       "Type": "AWS::Lambda::Function",
       "Properties": {
         "Code": {
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/mossad/dev/1513690434566-2017-12-19T13:33:54.566Z/mossad-1.0-SNAPSHOT.zip"
+          "S3Key": "serverless/mossad/dev/1513696237664-2017-12-19T15:10:37.664Z/mossad-1.0-SNAPSHOT.zip"
         },
-        "FunctionName": "mossad-dev-wstester",
+        "FunctionName": "mossad-dev-get",
         "Handler": "mossad.GetHandler",
         "MemorySize": 448,
         "Role": {
@@ -131,18 +143,91 @@
         }
       },
       "DependsOn": [
-        "WstesterLogGroup",
+        "GetLogGroup",
         "IamRoleLambdaExecution"
       ]
     },
-    "WstesterLambdaVersiond3MqKvT3Zh9jKVzxLJ9jSPv2aMCVGnbNoq0lPZM": {
+    "GetLambdaVersionpct7YN54XJiFHc8Kkdzt7r3ESX3Fg6L5cHsZ98nqzfg": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
-          "Ref": "WstesterLambdaFunction"
+          "Ref": "GetLambdaFunction"
         },
-        "CodeSha256": "d3MqKvT/3Zh9jKVzxL+J9jSPv2aMCVGnbN+oq/0lPZM="
+        "CodeSha256": "pct7YN54XJiFHc8Kkdzt7r3ESX3Fg6L5cHsZ98nqzfg="
+      }
+    },
+    "ExtractLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/mossad/dev/1513696237664-2017-12-19T15:10:37.664Z/mossad-1.0-SNAPSHOT.zip"
+        },
+        "FunctionName": "mossad-dev-extract",
+        "Handler": "mossad.Reindex",
+        "MemorySize": 448,
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        },
+        "Runtime": "java8",
+        "Timeout": 300
+      },
+      "DependsOn": [
+        "ExtractLogGroup",
+        "IamRoleLambdaExecution"
+      ]
+    },
+    "ExtractLambdaVersionpct7YN54XJiFHc8Kkdzt7r3ESX3Fg6L5cHsZ98nqzfg": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "ExtractLambdaFunction"
+        },
+        "CodeSha256": "pct7YN54XJiFHc8Kkdzt7r3ESX3Fg6L5cHsZ98nqzfg="
+      }
+    },
+    "ExtractEventsRuleSchedule1": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "ScheduleExpression": "rate(30 minutes)",
+        "State": "DISABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "ExtractLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Id": "extractSchedule"
+          }
+        ]
+      }
+    },
+    "ExtractLambdaPermissionEventsRuleSchedule1": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "ExtractLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "ExtractEventsRuleSchedule1",
+            "Arn"
+          ]
+        }
       }
     },
     "ApiGatewayRestApi": {
@@ -218,7 +303,7 @@
                 ":lambda:path/2015-03-31/functions/",
                 {
                   "Fn::GetAtt": [
-                    "WstesterLambdaFunction",
+                    "GetLambdaFunction",
                     "Arn"
                   ]
                 },
@@ -230,7 +315,7 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayDeployment1513690434619": {
+    "ApiGatewayDeployment1513696237796": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -242,12 +327,12 @@
         "ApiGatewayMethodContentIdVarRecommendationsGet"
       ]
     },
-    "WstesterLambdaPermissionApiGateway": {
+    "GetLambdaPermissionApiGateway": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "FunctionName": {
           "Fn::GetAtt": [
-            "WstesterLambdaFunction",
+            "GetLambdaFunction",
             "Arn"
           ]
         },
@@ -358,10 +443,16 @@
         "Ref": "ServerlessDeploymentBucket"
       }
     },
-    "WstesterLambdaFunctionQualifiedArn": {
+    "GetLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "WstesterLambdaVersiond3MqKvT3Zh9jKVzxLJ9jSPv2aMCVGnbNoq0lPZM"
+        "Ref": "GetLambdaVersionpct7YN54XJiFHc8Kkdzt7r3ESX3Fg6L5cHsZ98nqzfg"
+      }
+    },
+    "ExtractLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "ExtractLambdaVersionpct7YN54XJiFHc8Kkdzt7r3ESX3Fg6L5cHsZ98nqzfg"
       }
     },
     "ServiceEndpoint": {
