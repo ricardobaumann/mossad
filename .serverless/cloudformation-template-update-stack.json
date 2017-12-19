@@ -116,7 +116,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/mossad/dev/1513701894263-2017-12-19T16:44:54.263Z/mossad-1.0-SNAPSHOT.zip"
+          "S3Key": "serverless/mossad/dev/1513717532944-2017-12-19T21:05:32.944Z/mossad-1.0-SNAPSHOT.zip"
         },
         "FunctionName": "mossad-dev-get",
         "Handler": "mossad.GetHandler",
@@ -133,7 +133,19 @@
           "Variables": {
             "threadPoolSize": 20,
             "maxPages": 20,
-            "pageSize": 500
+            "pageSize": 500,
+            "apiBaseUrl": {
+              "Fn::Join": [
+                "",
+                [
+                  " https://",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  ".execute-api.eu-west-1.amazonaws.com/dev"
+                ]
+              ]
+            }
           }
         },
         "VpcConfig": {
@@ -154,14 +166,14 @@
         "IamRoleLambdaExecution"
       ]
     },
-    "GetLambdaVersionzFUQ5DXnt6QquhgbiemQgg43vSvHARHnIndDpR8nOY": {
+    "GetLambdaVersionHtce9rmrZkhhmfSTx4DXRfUqPy7hi7RQqrcGS3J18": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "GetLambdaFunction"
         },
-        "CodeSha256": "zFUQ5DXnt6Qquhgbiem/Qgg43vSvHARHnIndDpR8nOY="
+        "CodeSha256": "Htce9rmrZkhh/mf/STx4DXRfUqPy7hi7RQqrcGS3J18="
       }
     },
     "ExtractLambdaFunction": {
@@ -171,7 +183,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/mossad/dev/1513701894263-2017-12-19T16:44:54.263Z/mossad-1.0-SNAPSHOT.zip"
+          "S3Key": "serverless/mossad/dev/1513717532944-2017-12-19T21:05:32.944Z/mossad-1.0-SNAPSHOT.zip"
         },
         "FunctionName": "mossad-dev-extract",
         "Handler": "mossad.Reindex",
@@ -188,20 +200,20 @@
           "Variables": {
             "threadPoolSize": 20,
             "maxPages": 20,
-            "pageSize": 500
+            "pageSize": 500,
+            "apiBaseUrl": {
+              "Fn::Join": [
+                "",
+                [
+                  " https://",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  ".execute-api.eu-west-1.amazonaws.com/dev"
+                ]
+              ]
+            }
           }
-        },
-        "VpcConfig": {
-          "SecurityGroupIds": [
-            {
-              "Fn::GetAtt": "ServerlessSecurityGroup.GroupId"
-            }
-          ],
-          "SubnetIds": [
-            {
-              "Ref": "ServerlessSubnet"
-            }
-          ]
         }
       },
       "DependsOn": [
@@ -209,14 +221,14 @@
         "IamRoleLambdaExecution"
       ]
     },
-    "ExtractLambdaVersionzFUQ5DXnt6QquhgbiemQgg43vSvHARHnIndDpR8nOY": {
+    "ExtractLambdaVersionHtce9rmrZkhhmfSTx4DXRfUqPy7hi7RQqrcGS3J18": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "ExtractLambdaFunction"
         },
-        "CodeSha256": "zFUQ5DXnt6Qquhgbiem/Qgg43vSvHARHnIndDpR8nOY="
+        "CodeSha256": "Htce9rmrZkhh/mf/STx4DXRfUqPy7hi7RQqrcGS3J18="
       }
     },
     "ExtractEventsRuleSchedule1": {
@@ -341,7 +353,7 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayDeployment1513701894368": {
+    "ApiGatewayDeployment1513717533045": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -472,13 +484,13 @@
     "GetLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "GetLambdaVersionzFUQ5DXnt6QquhgbiemQgg43vSvHARHnIndDpR8nOY"
+        "Ref": "GetLambdaVersionHtce9rmrZkhhmfSTx4DXRfUqPy7hi7RQqrcGS3J18"
       }
     },
     "ExtractLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "ExtractLambdaVersionzFUQ5DXnt6QquhgbiemQgg43vSvHARHnIndDpR8nOY"
+        "Ref": "ExtractLambdaVersionHtce9rmrZkhhmfSTx4DXRfUqPy7hi7RQqrcGS3J18"
       }
     },
     "ServiceEndpoint": {

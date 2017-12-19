@@ -49,10 +49,11 @@ fun feedRecommendations() {
                         .httpGet().timeout(60000).timeoutRead(60000).responseObject<ArrayNode>()
                 when (result) {
                     is Result.Failure -> {
-                        println("Failed to read piwik results due to ${result.error}")
+                        println("Failed to read piwik results due to ${result.error.response.statusCode}")
                         emptyResponse
                     }
                     is Result.Success -> {
+                        println("Page processed succesfully")
                         result.get()
                     }
                 }

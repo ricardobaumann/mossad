@@ -1,5 +1,8 @@
 service: mossad
 
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  region: ${opt:region, self:provider.region}
 
 provider:
   name: aws
@@ -20,6 +23,7 @@ provider:
     threadPoolSize: 20
     maxPages: 20
     pageSize: 500
+    apiBaseUrl: { "Fn::Join" : ["", [" https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.${self:custom.region}.amazonaws.com/${self:custom.stage}" ] ]  }
 
 package:
   artifact: build/distributions/mossad-1.0-SNAPSHOT.zip
@@ -43,11 +47,6 @@ functions:
                 id: true
 
   extract:
-    vpc:
-      securityGroupIds:
-        - "Fn::GetAtt": ServerlessSecurityGroup.GroupId
-      subnetIds:
-        - Ref: ServerlessSubnet
     handler: mossad.Reindex
     timeout: 300
     events:
