@@ -14,6 +14,7 @@ class GetHandler : RequestStreamHandler {
         val inputJson = objectMapper.readTree(input)
         val id = inputJson["pathParameters"]["id"].asText()
         val result = jedis[id] ?: "[]"
+        jedis["test"] = id
         output.write(objectMapper.writeValueAsString(ApiGatewayResponse(body = result)))
     }
 

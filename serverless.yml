@@ -17,7 +17,9 @@ provider:
     Resource: "*"
 
   environment:
-    threadPoolSize: 25
+    threadPoolSize: 20
+    maxPages: 20
+    pageSize: 500
 
 package:
   artifact: build/distributions/mossad-1.0-SNAPSHOT.zip
@@ -41,6 +43,11 @@ functions:
                 id: true
 
   extract:
+    vpc:
+      securityGroupIds:
+        - "Fn::GetAtt": ServerlessSecurityGroup.GroupId
+      subnetIds:
+        - Ref: ServerlessSubnet
     handler: mossad.Reindex
     timeout: 300
     events:

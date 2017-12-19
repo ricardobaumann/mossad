@@ -13,13 +13,14 @@ import java.util.stream.Collectors
 import java.util.stream.IntStream
 import kotlin.system.exitProcess
 
-private val pageSize = 500
+private val pageSize = (System.getenv("pageSize") ?: "500").toInt()
 
-private val threadPoolSize = (System.getenv("threadPoolSize") ?: "10").toInt()
+private val maxPages = (System.getenv("maxPages") ?: "20").toInt()
 
+//TODO add piwk token as encrypted param on lambda
 private val visitorsLogPiwikUrl = "$piwikBaseUrl?module=API&method=Live.getLastVisitsDetails&format=JSON&idSite=1&period=day&date=today&expanded=1&token_auth=325b6226f6b06472e78e6da694999486&filter_limit=${pageSize}"
 
-private val threadPool = Executors.newFixedThreadPool(threadPoolSize)
+private val threadPool = Executors.newFixedThreadPool((System.getenv("threadPoolSize") ?: "10").toInt())
 
 private fun String.extractContentId(): String {
     val parts = this.split("/")
@@ -40,9 +41,11 @@ fun main(args: Array<String>) {
 fun feedRecommendations() {
     val fromToIds = HashMap<String, MutableList<String>>()
     val emptyResponse = objectMapper.createArrayNode()
-    IntStream.rangeClosed(0, threadPoolSize).mapToObj { page ->
+    jedis["running"] = "yes"
+    IntStream.rangeClosed(0, maxPages).mapToObj { page ->
         CompletableFuture.supplyAsync(Supplier {
             try {
+                println("Starting $page on thread ${Thread.currentThread().id}")
                 val offset = page * pageSize
                 val (_, _, result) = ("$visitorsLogPiwikUrl&filter_offset=$offset")
                         .httpGet().responseObject<ArrayNode>()
@@ -54,8 +57,6 @@ fun feedRecommendations() {
                     is Result.Success -> {
                         println("Page $page processed successfully")
                         result.get()
-
-
                     }
                 }
             } catch (e: Exception) {
@@ -78,7 +79,7 @@ fun feedRecommendations() {
                 .limit(10).map { it.key }
                 .collect(Collectors.toList())
 
-        pipeline.set(t.key, mostHit.toJsonString())
+        pipeline[t.key] = mostHit.toJsonString()
     }
     pipeline.sync()
 }

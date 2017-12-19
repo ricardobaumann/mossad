@@ -116,7 +116,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/mossad/dev/1513697082253-2017-12-19T15:24:42.253Z/mossad-1.0-SNAPSHOT.zip"
+          "S3Key": "serverless/mossad/dev/1513700757260-2017-12-19T16:25:57.260Z/mossad-1.0-SNAPSHOT.zip"
         },
         "FunctionName": "mossad-dev-get",
         "Handler": "mossad.GetHandler",
@@ -129,6 +129,13 @@
         },
         "Runtime": "java8",
         "Timeout": 30,
+        "Environment": {
+          "Variables": {
+            "threadPoolSize": 20,
+            "maxPages": 20,
+            "pageSize": 500
+          }
+        },
         "VpcConfig": {
           "SecurityGroupIds": [
             {
@@ -147,14 +154,14 @@
         "IamRoleLambdaExecution"
       ]
     },
-    "GetLambdaVersioniomXijAL3Kzp5PODluTr5ksOE1FkqnJpF29puQQPJA": {
+    "GetLambdaVersion6fwXh63iXPs2tDBmzMyEuX2inuFTf2ZgXkMXNWM0": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "GetLambdaFunction"
         },
-        "CodeSha256": "iomXijAL3Kzp5PODluTr5ksOE1FkqnJp+F29puQQPJA="
+        "CodeSha256": "6fw+Xh63iXPs2tDBmzMy+EuX2inuFTf2ZgXkMXN/WM0="
       }
     },
     "ExtractLambdaFunction": {
@@ -164,7 +171,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/mossad/dev/1513697082253-2017-12-19T15:24:42.253Z/mossad-1.0-SNAPSHOT.zip"
+          "S3Key": "serverless/mossad/dev/1513700757260-2017-12-19T16:25:57.260Z/mossad-1.0-SNAPSHOT.zip"
         },
         "FunctionName": "mossad-dev-extract",
         "Handler": "mossad.Reindex",
@@ -176,21 +183,40 @@
           ]
         },
         "Runtime": "java8",
-        "Timeout": 300
+        "Timeout": 300,
+        "Environment": {
+          "Variables": {
+            "threadPoolSize": 20,
+            "maxPages": 20,
+            "pageSize": 500
+          }
+        },
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            {
+              "Fn::GetAtt": "ServerlessSecurityGroup.GroupId"
+            }
+          ],
+          "SubnetIds": [
+            {
+              "Ref": "ServerlessSubnet"
+            }
+          ]
+        }
       },
       "DependsOn": [
         "ExtractLogGroup",
         "IamRoleLambdaExecution"
       ]
     },
-    "ExtractLambdaVersioniomXijAL3Kzp5PODluTr5ksOE1FkqnJpF29puQQPJA": {
+    "ExtractLambdaVersion6fwXh63iXPs2tDBmzMyEuX2inuFTf2ZgXkMXNWM0": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "ExtractLambdaFunction"
         },
-        "CodeSha256": "iomXijAL3Kzp5PODluTr5ksOE1FkqnJp+F29puQQPJA="
+        "CodeSha256": "6fw+Xh63iXPs2tDBmzMy+EuX2inuFTf2ZgXkMXN/WM0="
       }
     },
     "ExtractEventsRuleSchedule1": {
@@ -315,7 +341,7 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayDeployment1513697082337": {
+    "ApiGatewayDeployment1513700757350": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -446,13 +472,13 @@
     "GetLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "GetLambdaVersioniomXijAL3Kzp5PODluTr5ksOE1FkqnJpF29puQQPJA"
+        "Ref": "GetLambdaVersion6fwXh63iXPs2tDBmzMyEuX2inuFTf2ZgXkMXNWM0"
       }
     },
     "ExtractLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "ExtractLambdaVersioniomXijAL3Kzp5PODluTr5ksOE1FkqnJpF29puQQPJA"
+        "Ref": "ExtractLambdaVersion6fwXh63iXPs2tDBmzMyEuX2inuFTf2ZgXkMXNWM0"
       }
     },
     "ServiceEndpoint": {
