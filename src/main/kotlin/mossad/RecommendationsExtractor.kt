@@ -15,7 +15,7 @@ import kotlin.system.exitProcess
 
 private val pageSize = 500
 
-private val maxPages = 30
+private val maxPages = 25
 
 private val visitorsLogPiwikUrl = "$piwikBaseUrl?module=API&method=Live.getLastVisitsDetails&format=JSON&idSite=1&period=day&date=today&expanded=1&token_auth=325b6226f6b06472e78e6da694999486&filter_limit=${pageSize}"
 

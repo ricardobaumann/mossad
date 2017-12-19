@@ -116,7 +116,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/mossad/dev/1513696237664-2017-12-19T15:10:37.664Z/mossad-1.0-SNAPSHOT.zip"
+          "S3Key": "serverless/mossad/dev/1513696658331-2017-12-19T15:17:38.331Z/mossad-1.0-SNAPSHOT.zip"
         },
         "FunctionName": "mossad-dev-get",
         "Handler": "mossad.GetHandler",
@@ -147,14 +147,14 @@
         "IamRoleLambdaExecution"
       ]
     },
-    "GetLambdaVersionpct7YN54XJiFHc8Kkdzt7r3ESX3Fg6L5cHsZ98nqzfg": {
+    "GetLambdaVersionGUzXM1mkp9kKhgG1nBYreez18aBYXXK3JXxH0NmtI": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "GetLambdaFunction"
         },
-        "CodeSha256": "pct7YN54XJiFHc8Kkdzt7r3ESX3Fg6L5cHsZ98nqzfg="
+        "CodeSha256": "+GUzXM1/mkp9kKhgG1nBYreez18aBYXXK3JXxH0NmtI="
       }
     },
     "ExtractLambdaFunction": {
@@ -164,7 +164,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/mossad/dev/1513696237664-2017-12-19T15:10:37.664Z/mossad-1.0-SNAPSHOT.zip"
+          "S3Key": "serverless/mossad/dev/1513696658331-2017-12-19T15:17:38.331Z/mossad-1.0-SNAPSHOT.zip"
         },
         "FunctionName": "mossad-dev-extract",
         "Handler": "mossad.Reindex",
@@ -183,14 +183,14 @@
         "IamRoleLambdaExecution"
       ]
     },
-    "ExtractLambdaVersionpct7YN54XJiFHc8Kkdzt7r3ESX3Fg6L5cHsZ98nqzfg": {
+    "ExtractLambdaVersionGUzXM1mkp9kKhgG1nBYreez18aBYXXK3JXxH0NmtI": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "ExtractLambdaFunction"
         },
-        "CodeSha256": "pct7YN54XJiFHc8Kkdzt7r3ESX3Fg6L5cHsZ98nqzfg="
+        "CodeSha256": "+GUzXM1/mkp9kKhgG1nBYreez18aBYXXK3JXxH0NmtI="
       }
     },
     "ExtractEventsRuleSchedule1": {
@@ -315,7 +315,7 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayDeployment1513696237796": {
+    "ApiGatewayDeployment1513696658420": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -446,13 +446,13 @@
     "GetLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "GetLambdaVersionpct7YN54XJiFHc8Kkdzt7r3ESX3Fg6L5cHsZ98nqzfg"
+        "Ref": "GetLambdaVersionGUzXM1mkp9kKhgG1nBYreez18aBYXXK3JXxH0NmtI"
       }
     },
     "ExtractLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "ExtractLambdaVersionpct7YN54XJiFHc8Kkdzt7r3ESX3Fg6L5cHsZ98nqzfg"
+        "Ref": "ExtractLambdaVersionGUzXM1mkp9kKhgG1nBYreez18aBYXXK3JXxH0NmtI"
       }
     },
     "ServiceEndpoint": {
