@@ -15,11 +15,11 @@ import kotlin.system.exitProcess
 
 private val pageSize = 500
 
-private val maxPages = 25
+private val threadPoolSize = (System.getenv("threadPoolSize") ?: "10").toInt()
 
 private val visitorsLogPiwikUrl = "$piwikBaseUrl?module=API&method=Live.getLastVisitsDetails&format=JSON&idSite=1&period=day&date=today&expanded=1&token_auth=325b6226f6b06472e78e6da694999486&filter_limit=${pageSize}"
 
-private val threadPool = Executors.newFixedThreadPool(maxPages)
+private val threadPool = Executors.newFixedThreadPool(threadPoolSize)
 
 private fun String.extractContentId(): String {
     val parts = this.split("/")
@@ -40,7 +40,7 @@ fun main(args: Array<String>) {
 fun feedRecommendations() {
     val fromToIds = HashMap<String, MutableList<String>>()
     val emptyResponse = objectMapper.createArrayNode()
-    IntStream.rangeClosed(0, maxPages).mapToObj { page ->
+    IntStream.rangeClosed(0, threadPoolSize).mapToObj { page ->
         CompletableFuture.supplyAsync(Supplier {
             try {
                 val offset = page * pageSize

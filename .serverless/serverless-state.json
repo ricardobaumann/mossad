@@ -143,7 +143,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/mossad/dev/1513696658331-2017-12-19T15:17:38.331Z/mossad-1.0-SNAPSHOT.zip"
+                "S3Key": "serverless/mossad/dev/1513697082253-2017-12-19T15:24:42.253Z/mossad-1.0-SNAPSHOT.zip"
               },
               "FunctionName": "mossad-dev-get",
               "Handler": "mossad.GetHandler",
@@ -174,14 +174,14 @@
               "IamRoleLambdaExecution"
             ]
           },
-          "GetLambdaVersionGUzXM1mkp9kKhgG1nBYreez18aBYXXK3JXxH0NmtI": {
+          "GetLambdaVersioniomXijAL3Kzp5PODluTr5ksOE1FkqnJpF29puQQPJA": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "GetLambdaFunction"
               },
-              "CodeSha256": "+GUzXM1/mkp9kKhgG1nBYreez18aBYXXK3JXxH0NmtI="
+              "CodeSha256": "iomXijAL3Kzp5PODluTr5ksOE1FkqnJp+F29puQQPJA="
             }
           },
           "ExtractLambdaFunction": {
@@ -191,7 +191,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/mossad/dev/1513696658331-2017-12-19T15:17:38.331Z/mossad-1.0-SNAPSHOT.zip"
+                "S3Key": "serverless/mossad/dev/1513697082253-2017-12-19T15:24:42.253Z/mossad-1.0-SNAPSHOT.zip"
               },
               "FunctionName": "mossad-dev-extract",
               "Handler": "mossad.Reindex",
@@ -210,14 +210,14 @@
               "IamRoleLambdaExecution"
             ]
           },
-          "ExtractLambdaVersionGUzXM1mkp9kKhgG1nBYreez18aBYXXK3JXxH0NmtI": {
+          "ExtractLambdaVersioniomXijAL3Kzp5PODluTr5ksOE1FkqnJpF29puQQPJA": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ExtractLambdaFunction"
               },
-              "CodeSha256": "+GUzXM1/mkp9kKhgG1nBYreez18aBYXXK3JXxH0NmtI="
+              "CodeSha256": "iomXijAL3Kzp5PODluTr5ksOE1FkqnJp+F29puQQPJA="
             }
           },
           "ExtractEventsRuleSchedule1": {
@@ -342,7 +342,7 @@
               "MethodResponses": []
             }
           },
-          "ApiGatewayDeployment1513696658420": {
+          "ApiGatewayDeployment1513697082337": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -473,13 +473,13 @@
           "GetLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "GetLambdaVersionGUzXM1mkp9kKhgG1nBYreez18aBYXXK3JXxH0NmtI"
+              "Ref": "GetLambdaVersioniomXijAL3Kzp5PODluTr5ksOE1FkqnJpF29puQQPJA"
             }
           },
           "ExtractLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ExtractLambdaVersionGUzXM1mkp9kKhgG1nBYreez18aBYXXK3JXxH0NmtI"
+              "Ref": "ExtractLambdaVersioniomXijAL3Kzp5PODluTr5ksOE1FkqnJpF29puQQPJA"
             }
           },
           "ServiceEndpoint": {
@@ -649,7 +649,7 @@
     }
   },
   "package": {
-    "artifactDirectoryName": "serverless/mossad/dev/1513696658331-2017-12-19T15:17:38.331Z",
+    "artifactDirectoryName": "serverless/mossad/dev/1513697082253-2017-12-19T15:24:42.253Z",
     "artifact": "mossad-1.0-SNAPSHOT.zip"
   }
 }
