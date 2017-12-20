@@ -11,6 +11,7 @@ import java.util.concurrent.Executors
 import java.util.function.Supplier
 import java.util.stream.Collectors
 import java.util.stream.IntStream
+import java.util.stream.Stream
 import kotlin.system.exitProcess
 
 private val pageSize = (System.getenv("pageSize") ?: "500").toInt()
@@ -38,11 +39,10 @@ fun main(args: Array<String>) {
     exitProcess(0)
 }
 
-//TODO enhance and simplify extraction
 fun extractRecommendations(): Map<String, MutableList<String>> {
-    val fromToIds = HashMap<String, MutableList<String>>()
+
     val emptyResponse = objectMapper.createArrayNode()
-    IntStream.rangeClosed(0, maxPages).mapToObj { page ->
+    return IntStream.rangeClosed(0, maxPages).mapToObj { page ->
         CompletableFuture.supplyAsync(Supplier {
             try {
                 val offset = page * pageSize
@@ -65,26 +65,13 @@ fun extractRecommendations(): Map<String, MutableList<String>> {
 
         }, threadPool)
 
-    }.map { it.join() }.forEach { extractRelations(it, fromToIds) }
-
-    return fromToIds.entries.stream().collect(Collectors.toList()).associate { it.key to extractMostHit(it.value) }
-}
-
-fun extractMostHit(inputList: MutableList<String>): MutableList<String> {
-
-    return inputList.stream().collect(Collectors.groupingBy({ w -> w }, Collectors.counting()))
-            .entries.stream()
-            .sorted(Comparator.comparingInt<MutableMap.MutableEntry<Any?, Long>> { value -> value.value.toInt() }
-                    .reversed())
-            .limit(10).map { it.key }
-            .map { it.toString() }
-            .collect(Collectors.toList())
+    }.map { it.join() }.extractRelations().entries.stream().collect(Collectors.toList()).associate { it.key to extractMostHit(it.value) }
 
 }
 
-private fun extractRelations(resultArray: ArrayNode, fromToIds: HashMap<String, MutableList<String>>) {
-    resultArray.stream()
-            .map { visit -> visit["actionDetails"] as ArrayNode }
+private fun Stream<ArrayNode>.extractRelations(): HashMap<String, MutableList<String>> {
+    val fromToIds = HashMap<String, MutableList<String>>()
+    this.map { visit -> visit["actionDetails"] as ArrayNode }
             .map { actionDetails ->
                 actionDetails.stream()
                         .map { actiondetail -> actiondetail["url"].asText() }
@@ -103,4 +90,17 @@ private fun extractRelations(resultArray: ArrayNode, fromToIds: HashMap<String, 
                 }
 
             }
+    return fromToIds
+}
+
+fun extractMostHit(inputList: MutableList<String>): MutableList<String> {
+
+    return inputList.stream().collect(Collectors.groupingBy({ w -> w }, Collectors.counting()))
+            .entries.stream()
+            .sorted(Comparator.comparingInt<MutableMap.MutableEntry<Any?, Long>> { value -> value.value.toInt() }
+                    .reversed())
+            .limit(10).map { it.key }
+            .map { it.toString() }
+            .collect(Collectors.toList())
+
 }
