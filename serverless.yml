@@ -3,6 +3,7 @@ service: mossad
 custom:
   stage: ${opt:stage, self:provider.stage}
   region: ${opt:region, self:provider.region}
+  secrets: application.yml
 
 provider:
   name: aws

@@ -16,10 +16,9 @@ import kotlin.system.exitProcess
 
 private val pageSize = (System.getenv("pageSize") ?: "500").toInt()
 
-private val maxPages = (System.getenv("maxPages") ?: "20").toInt()
+private val maxPages = (System.getenv("maxPages") ?: "2").toInt()
 
-//TODO add piwk token as encrypted param on lambda
-private val visitorsLogPiwikUrl = "$piwikBaseUrl?module=API&method=Live.getLastVisitsDetails&format=JSON&idSite=1&period=day&date=today&expanded=1&token_auth=325b6226f6b06472e78e6da694999486&filter_limit=$pageSize"
+private val visitorsLogPiwikUrl = "$piwikBaseUrl?module=API&method=Live.getLastVisitsDetails&format=JSON&idSite=1&period=day&date=today&expanded=1&token_auth=${params.piwikToken}&filter_limit=$pageSize"
 
 private val threadPool = Executors.newFixedThreadPool((System.getenv("threadPoolSize") ?: "10").toInt())
 
@@ -33,9 +32,14 @@ private fun String.extractContentId(): String {
 
 
 fun main(args: Array<String>) {
-    println("Started at ${LocalDateTime.now()}")
-    extractRecommendations()
-    println("Finished at ${LocalDateTime.now()}")
+    try {
+        println("Started at ${LocalDateTime.now()}")
+        extractRecommendations()
+        println("Finished at ${LocalDateTime.now()}")
+    } catch (e: Exception) {
+        e.printStackTrace()
+        exitProcess(1)
+    }
     exitProcess(0)
 }
 
@@ -71,10 +75,10 @@ fun extractRecommendations(): Map<String, MutableList<String>> {
 
 private fun Stream<ArrayNode>.extractRelations(): HashMap<String, MutableList<String>> {
     val fromToIds = HashMap<String, MutableList<String>>()
-    this.map { visit -> visit["actionDetails"] as ArrayNode }
+    this.flatMap { it.stream() }.map { visit -> visit["actionDetails"] as ArrayNode }
             .map { actionDetails ->
                 actionDetails.stream()
-                        .map { actiondetail -> actiondetail["url"].asText() }
+                        .map { actionDetail -> actionDetail["url"].asText() }
                         .collect(Collectors.toList())
             }
             .forEach { urls ->
@@ -90,6 +94,7 @@ private fun Stream<ArrayNode>.extractRelations(): HashMap<String, MutableList<St
                 }
 
             }
+    //fromToIds.entries.forEach { println("${it.key} = ${it.value}") }
     return fromToIds
 }
 

@@ -89,3 +89,5 @@ gradle-app.setting
 hs_err_pid*
 
 .idea/
+
+src/main/resources/
