@@ -91,3 +91,7 @@ hs_err_pid*
 .idea/
 
 src/main/resources/
+
+.serverless/
+node_modules/
+.DS_Store
