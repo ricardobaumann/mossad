@@ -3,7 +3,6 @@ service: mossad
 custom:
   stage: ${opt:stage, self:provider.stage}
   region: ${opt:region, self:provider.region}
-  secrets: application.yml
 
 provider:
   name: aws
@@ -26,6 +25,12 @@ functions:
     handler: mossad.GetHandler
     timeout: 30
     memorySize: 128
+    environment:
+      redisEndpoint:
+        "Fn::GetAtt": [ServerlessElasticacheCluster, RedisEndpoint.Address]
+      redisPort:
+        "Fn::GetAtt": [ServerlessElasticacheCluster, RedisEndpoint.Port]
+
     vpc:
       securityGroupIds:
         - "Fn::GetAtt": ServerlessSecurityGroup.GroupId
@@ -44,6 +49,12 @@ functions:
       handler: mossad.PutHandler
       timeout: 30
       memorySize: 128
+      environment:
+        redisEndpoint:
+          "Fn::GetAtt": [ServerlessElasticacheCluster, RedisEndpoint.Address]
+        redisPort:
+          "Fn::GetAtt": [ServerlessElasticacheCluster, RedisEndpoint.Port]
+
       vpc:
         securityGroupIds:
           - "Fn::GetAtt": ServerlessSecurityGroup.GroupId
