@@ -9,7 +9,7 @@ fun ArrayNode.stream(): Stream<JsonNode> {
     return StreamSupport.stream(this.spliterator(), false)
 }
 
-fun <E> MutableList<E>.toJsonString(): String {
+fun <E> List<E>.toJsonString(): String {
     return objectMapper.writeValueAsString(this)
 }
 

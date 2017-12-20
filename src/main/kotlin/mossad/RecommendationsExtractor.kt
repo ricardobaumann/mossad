@@ -38,7 +38,8 @@ fun main(args: Array<String>) {
     exitProcess(0)
 }
 
-fun feedRecommendations() {
+//TODO enhance and simplify extraction
+fun feedRecommendations(): Map<String, MutableList<String>> {
     val fromToIds = HashMap<String, MutableList<String>>()
     val emptyResponse = objectMapper.createArrayNode()
     IntStream.rangeClosed(0, maxPages).mapToObj { page ->
@@ -53,7 +54,7 @@ fun feedRecommendations() {
                         emptyResponse
                     }
                     is Result.Success -> {
-                        println("Page processed succesfully")
+                        println("Page processed successfully")
                         result.get()
                     }
                 }
@@ -65,21 +66,20 @@ fun feedRecommendations() {
         }, threadPool)
 
     }.map { it.join() }.forEach { extractRelations(it, fromToIds) }
-    //threadPool.awaitTermination(timeoutInMillis.toLong(), TimeUnit.MILLISECONDS)
-    val pipeline = jedis.pipelined()
-    fromToIds.entries.stream().forEach { t ->
 
-        val mostHit = t.value
-                .stream().collect(Collectors.groupingBy({ w -> w }, Collectors.counting()))
-                .entries.stream()
-                .sorted(Comparator.comparingInt<MutableMap.MutableEntry<Any?, Long>> { value -> value.value.toInt() }
-                        .reversed())
-                .limit(10).map { it.key }
-                .collect(Collectors.toList())
+    return fromToIds.entries.stream().collect(Collectors.toList()).associate { it.key to extractMostHit(it.value) }
+}
 
-        pipeline[t.key] = mostHit.toJsonString()
-    }
-    pipeline.sync()
+fun extractMostHit(inputList: MutableList<String>): MutableList<String> {
+
+    return inputList.stream().collect(Collectors.groupingBy({ w -> w }, Collectors.counting()))
+            .entries.stream()
+            .sorted(Comparator.comparingInt<MutableMap.MutableEntry<Any?, Long>> { value -> value.value.toInt() }
+                    .reversed())
+            .limit(10).map { it.key }
+            .map { it.toString() }
+            .collect(Collectors.toList())
+
 }
 
 private fun extractRelations(resultArray: ArrayNode, fromToIds: HashMap<String, MutableList<String>>) {

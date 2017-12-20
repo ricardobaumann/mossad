@@ -5,9 +5,6 @@ import com.amazonaws.services.lambda.runtime.RequestStreamHandler
 import com.github.kittinunf.fuel.core.requests.write
 import java.io.InputStream
 import java.io.OutputStream
-import java.util.*
-
-data class ApiGatewayResponse(val body: String, val headers: Map<String, String> = Collections.singletonMap("Content-Type", "application/json"), val statusCode: Int = 200, val isBase64Encoded: Boolean = false)
 
 class GetHandler : RequestStreamHandler {
     override fun handleRequest(input: InputStream?, output: OutputStream?, context: Context?) {

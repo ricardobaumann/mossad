@@ -39,12 +39,29 @@ functions:
         - Ref: ServerlessSubnet
     events:
       - http:
-          path: content/{id}/recommendations
+          path: recommendations/{id}
           method: get
           request:
             parameters:
               paths:
                 id: true
+
+  put:
+      handler: mossad.PutHandler
+      timeout: 30
+      vpc:
+        securityGroupIds:
+          - "Fn::GetAtt": ServerlessSecurityGroup.GroupId
+        subnetIds:
+          - Ref: ServerlessSubnet
+      events:
+        - http:
+            path: recommendations
+            method: put
+            request:
+              parameters:
+                paths:
+                  id: true
 
   extract:
     handler: mossad.Reindex
