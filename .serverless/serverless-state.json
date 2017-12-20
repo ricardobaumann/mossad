@@ -10,8 +10,6 @@
       "variableSyntax": "\\${([ ~:a-zA-Z0-9._'\",\\-\\/\\(\\)]+?)}",
       "name": "aws",
       "runtime": "java8",
-      "memorySize": 448,
-      "timeout": 300,
       "iamRoleStatements": [
         {
           "Effect": "Allow",
@@ -23,23 +21,6 @@
           "Resource": "*"
         }
       ],
-      "environment": {
-        "threadPoolSize": 20,
-        "maxPages": 20,
-        "pageSize": 500,
-        "apiBaseUrl": {
-          "Fn::Join": [
-            "",
-            [
-              " https://",
-              {
-                "Ref": "ApiGatewayRestApi"
-              },
-              ".execute-api.eu-west-1.amazonaws.com/dev"
-            ]
-          ]
-        }
-      },
       "versionFunctions": true,
       "remoteFunctionData": null,
       "compiledCloudFormationTemplate": {
@@ -172,11 +153,11 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/mossad/dev/1513767656521-2017-12-20T11:00:56.521Z/mossad-1.0-SNAPSHOT.zip"
+                "S3Key": "serverless/mossad/dev/1513771231613-2017-12-20T12:00:31.613Z/mossad-1.0-SNAPSHOT.zip"
               },
               "FunctionName": "mossad-dev-get",
               "Handler": "mossad.GetHandler",
-              "MemorySize": 448,
+              "MemorySize": 128,
               "Role": {
                 "Fn::GetAtt": [
                   "IamRoleLambdaExecution",
@@ -185,25 +166,6 @@
               },
               "Runtime": "java8",
               "Timeout": 30,
-              "Environment": {
-                "Variables": {
-                  "threadPoolSize": 20,
-                  "maxPages": 20,
-                  "pageSize": 500,
-                  "apiBaseUrl": {
-                    "Fn::Join": [
-                      "",
-                      [
-                        " https://",
-                        {
-                          "Ref": "ApiGatewayRestApi"
-                        },
-                        ".execute-api.eu-west-1.amazonaws.com/dev"
-                      ]
-                    ]
-                  }
-                }
-              },
               "VpcConfig": {
                 "SecurityGroupIds": [
                   {
@@ -222,14 +184,14 @@
               "IamRoleLambdaExecution"
             ]
           },
-          "GetLambdaVersionbZqFTJxx1j0gL4RPjBanHKc073avK53ZRs9SjzWDcQ": {
+          "GetLambdaVersioni2pEBg6KA2v8yYwWgS9PliKm1MnMvW1cJpgz9iQwyo": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "GetLambdaFunction"
               },
-              "CodeSha256": "bZqFTJxx1j0gL4RPjBanHKc073avK53Z/Rs9SjzWDcQ="
+              "CodeSha256": "i2pEBg6KA2v8yYwWgS9PliKm1Mn+MvW1cJpgz9iQwyo="
             }
           },
           "PutLambdaFunction": {
@@ -239,11 +201,11 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/mossad/dev/1513767656521-2017-12-20T11:00:56.521Z/mossad-1.0-SNAPSHOT.zip"
+                "S3Key": "serverless/mossad/dev/1513771231613-2017-12-20T12:00:31.613Z/mossad-1.0-SNAPSHOT.zip"
               },
               "FunctionName": "mossad-dev-put",
               "Handler": "mossad.PutHandler",
-              "MemorySize": 448,
+              "MemorySize": 128,
               "Role": {
                 "Fn::GetAtt": [
                   "IamRoleLambdaExecution",
@@ -252,25 +214,6 @@
               },
               "Runtime": "java8",
               "Timeout": 30,
-              "Environment": {
-                "Variables": {
-                  "threadPoolSize": 20,
-                  "maxPages": 20,
-                  "pageSize": 500,
-                  "apiBaseUrl": {
-                    "Fn::Join": [
-                      "",
-                      [
-                        " https://",
-                        {
-                          "Ref": "ApiGatewayRestApi"
-                        },
-                        ".execute-api.eu-west-1.amazonaws.com/dev"
-                      ]
-                    ]
-                  }
-                }
-              },
               "VpcConfig": {
                 "SecurityGroupIds": [
                   {
@@ -289,14 +232,14 @@
               "IamRoleLambdaExecution"
             ]
           },
-          "PutLambdaVersionbZqFTJxx1j0gL4RPjBanHKc073avK53ZRs9SjzWDcQ": {
+          "PutLambdaVersioni2pEBg6KA2v8yYwWgS9PliKm1MnMvW1cJpgz9iQwyo": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "PutLambdaFunction"
               },
-              "CodeSha256": "bZqFTJxx1j0gL4RPjBanHKc073avK53Z/Rs9SjzWDcQ="
+              "CodeSha256": "i2pEBg6KA2v8yYwWgS9PliKm1Mn+MvW1cJpgz9iQwyo="
             }
           },
           "ExtractLambdaFunction": {
@@ -306,10 +249,10 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/mossad/dev/1513767656521-2017-12-20T11:00:56.521Z/mossad-1.0-SNAPSHOT.zip"
+                "S3Key": "serverless/mossad/dev/1513771231613-2017-12-20T12:00:31.613Z/mossad-1.0-SNAPSHOT.zip"
               },
               "FunctionName": "mossad-dev-extract",
-              "Handler": "mossad.Reindex",
+              "Handler": "mossad.ExtractionHandler",
               "MemorySize": 448,
               "Role": {
                 "Fn::GetAtt": [
@@ -344,14 +287,14 @@
               "IamRoleLambdaExecution"
             ]
           },
-          "ExtractLambdaVersionbZqFTJxx1j0gL4RPjBanHKc073avK53ZRs9SjzWDcQ": {
+          "ExtractLambdaVersioni2pEBg6KA2v8yYwWgS9PliKm1MnMvW1cJpgz9iQwyo": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ExtractLambdaFunction"
               },
-              "CodeSha256": "bZqFTJxx1j0gL4RPjBanHKc073avK53Z/Rs9SjzWDcQ="
+              "CodeSha256": "i2pEBg6KA2v8yYwWgS9PliKm1Mn+MvW1cJpgz9iQwyo="
             }
           },
           "ExtractEventsRuleSchedule1": {
@@ -504,7 +447,7 @@
               "MethodResponses": []
             }
           },
-          "ApiGatewayDeployment1513767656650": {
+          "ApiGatewayDeployment1513771231732": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -669,19 +612,19 @@
           "GetLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "GetLambdaVersionbZqFTJxx1j0gL4RPjBanHKc073avK53ZRs9SjzWDcQ"
+              "Ref": "GetLambdaVersioni2pEBg6KA2v8yYwWgS9PliKm1MnMvW1cJpgz9iQwyo"
             }
           },
           "PutLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "PutLambdaVersionbZqFTJxx1j0gL4RPjBanHKc073avK53ZRs9SjzWDcQ"
+              "Ref": "PutLambdaVersioni2pEBg6KA2v8yYwWgS9PliKm1MnMvW1cJpgz9iQwyo"
             }
           },
           "ExtractLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ExtractLambdaVersionbZqFTJxx1j0gL4RPjBanHKc073avK53ZRs9SjzWDcQ"
+              "Ref": "ExtractLambdaVersioni2pEBg6KA2v8yYwWgS9PliKm1MnMvW1cJpgz9iQwyo"
             }
           },
           "ServiceEndpoint": {
@@ -727,6 +670,7 @@
       "get": {
         "handler": "mossad.GetHandler",
         "timeout": 30,
+        "memorySize": 128,
         "vpc": {
           "securityGroupIds": [
             {
@@ -759,6 +703,7 @@
       "put": {
         "handler": "mossad.PutHandler",
         "timeout": 30,
+        "memorySize": 128,
         "vpc": {
           "securityGroupIds": [
             {
@@ -789,8 +734,26 @@
         "package": {}
       },
       "extract": {
-        "handler": "mossad.Reindex",
+        "handler": "mossad.ExtractionHandler",
         "timeout": 300,
+        "memorySize": 448,
+        "environment": {
+          "threadPoolSize": 20,
+          "maxPages": 20,
+          "pageSize": 500,
+          "apiBaseUrl": {
+            "Fn::Join": [
+              "",
+              [
+                " https://",
+                {
+                  "Ref": "ApiGatewayRestApi"
+                },
+                ".execute-api.eu-west-1.amazonaws.com/dev"
+              ]
+            ]
+          }
+        },
         "events": [
           {
             "schedule": {
@@ -887,7 +850,7 @@
     }
   },
   "package": {
-    "artifactDirectoryName": "serverless/mossad/dev/1513767656521-2017-12-20T11:00:56.521Z",
+    "artifactDirectoryName": "serverless/mossad/dev/1513771231613-2017-12-20T12:00:31.613Z",
     "artifact": "mossad-1.0-SNAPSHOT.zip"
   }
 }

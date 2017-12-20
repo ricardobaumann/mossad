@@ -7,11 +7,10 @@ import com.github.kittinunf.result.Result
 import java.io.InputStream
 import java.io.OutputStream
 
-private val baseUrl = System.getenv("apiBaseUrl")
-
-class Reindex : RequestStreamHandler {
+class ExtractionHandler : RequestStreamHandler {
     override fun handleRequest(input: InputStream?, output: OutputStream?, context: Context?) {
-        val results = feedRecommendations()
+        val results = extractRecommendations()
+        println(results.entries.stream().findFirst().get().key)
         val (_, _, result) = "$apiBaseUrl/recommendations".httpPut().body(objectMapper.writeValueAsString(results)).response()
         when (result) {
             is Result.Success -> {

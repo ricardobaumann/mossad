@@ -7,8 +7,6 @@ custom:
 provider:
   name: aws
   runtime: java8
-  memorySize: 448
-  timeout: 300
   region: eu-west-1
 
   iamRoleStatements:
@@ -19,12 +17,6 @@ provider:
       - ec2:DeleteNetworkInterface
     Resource: "*"
 
-  environment:
-    threadPoolSize: 20
-    maxPages: 20
-    pageSize: 500
-    apiBaseUrl: { "Fn::Join" : ["", [" https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.${self:custom.region}.amazonaws.com/${self:custom.stage}" ] ]  }
-
 package:
   artifact: build/distributions/mossad-1.0-SNAPSHOT.zip
 
@@ -32,6 +24,7 @@ functions:
   get:
     handler: mossad.GetHandler
     timeout: 30
+    memorySize: 128
     vpc:
       securityGroupIds:
         - "Fn::GetAtt": ServerlessSecurityGroup.GroupId
@@ -49,6 +42,7 @@ functions:
   put:
       handler: mossad.PutHandler
       timeout: 30
+      memorySize: 128
       vpc:
         securityGroupIds:
           - "Fn::GetAtt": ServerlessSecurityGroup.GroupId
@@ -64,12 +58,19 @@ functions:
                   id: true
 
   extract:
-    handler: mossad.Reindex
+    handler: mossad.ExtractionHandler
     timeout: 300
+    memorySize: 448
+    environment:
+        threadPoolSize: 20
+        maxPages: 20
+        pageSize: 500
+        apiBaseUrl: { "Fn::Join" : ["", [" https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.${self:custom.region}.amazonaws.com/${self:custom.stage}" ] ]  }
     events:
       - schedule:
          rate: rate(30 minutes)
          enabled: false
+
 
 resources:
   Resources:

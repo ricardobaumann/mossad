@@ -33,13 +33,13 @@ private fun String.extractContentId(): String {
 
 fun main(args: Array<String>) {
     println("Started at ${LocalDateTime.now()}")
-    feedRecommendations()
+    extractRecommendations()
     println("Finished at ${LocalDateTime.now()}")
     exitProcess(0)
 }
 
 //TODO enhance and simplify extraction
-fun feedRecommendations(): Map<String, MutableList<String>> {
+fun extractRecommendations(): Map<String, MutableList<String>> {
     val fromToIds = HashMap<String, MutableList<String>>()
     val emptyResponse = objectMapper.createArrayNode()
     IntStream.rangeClosed(0, maxPages).mapToObj { page ->
