@@ -91,7 +91,7 @@ private fun Stream<ArrayNode>.extractRelations(): HashMap<String, MutableList<St
                 }
 
             }
-    fromToIds.entries.forEach { println("${it.key} = ${it.value}") }
+    //fromToIds.entries.forEach { println("${it.key} = ${it.value}") }
     return fromToIds
 }
 
