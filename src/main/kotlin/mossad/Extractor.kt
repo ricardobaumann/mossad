@@ -16,7 +16,7 @@ import kotlin.system.exitProcess
 
 private val pageSize = (System.getenv("pageSize") ?: "500").toInt()
 
-private val maxPages = (System.getenv("maxPages") ?: "2").toInt()
+private val maxPages = (System.getenv("maxPages") ?: "200").toInt()
 
 private val visitorsLogPiwikUrl = "$piwikBaseUrl?module=API&method=Live.getLastVisitsDetails&format=JSON&idSite=1&period=day&date=today&expanded=1&token_auth=${params.piwikToken}&filter_limit=$pageSize"
 
@@ -46,9 +46,10 @@ fun main(args: Array<String>) {
 fun extractRecommendations(): Map<String, MutableList<String>> {
 
     val emptyResponse = objectMapper.createArrayNode()
-    return IntStream.rangeClosed(0, maxPages).mapToObj { page ->
+    val futures = IntStream.rangeClosed(0, maxPages).mapToObj { page ->
         CompletableFuture.supplyAsync(Supplier {
             try {
+                println("Starting page $page")
                 val offset = page * pageSize
                 val (_, _, result) = ("$visitorsLogPiwikUrl&filter_offset=$offset")
                         .httpGet().timeout(60000).timeoutRead(60000).responseObject<ArrayNode>()
@@ -58,18 +59,22 @@ fun extractRecommendations(): Map<String, MutableList<String>> {
                         emptyResponse
                     }
                     is Result.Success -> {
-                        println("Page processed successfully")
+                        println("Page $page processed successfully")
                         result.get()
                     }
                 }
             } catch (e: Exception) {
-                println("Failed to process page: $e")
+                println("Failed to process page $page: $e")
                 emptyResponse
             }
 
         }, threadPool)
 
-    }.map { it.join() }.extractRelations().entries.stream().collect(Collectors.toList()).associate { it.key to extractMostHit(it.value) }
+    }.collect(Collectors.toList())
+
+    CompletableFuture.allOf(*futures.toTypedArray()).get()
+
+    return futures.stream().map { it.join() }.extractRelations().entries.stream().collect(Collectors.toList()).associate { it.key to extractMostHit(it.value) }
 
 }
 
