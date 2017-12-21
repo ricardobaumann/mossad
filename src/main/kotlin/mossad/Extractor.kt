@@ -16,11 +16,9 @@ import kotlin.system.exitProcess
 
 private val pageSize = (System.getenv("pageSize") ?: "500").toInt()
 
-private val maxPages = (System.getenv("maxPages") ?: "200").toInt()
+private val maxPages = (System.getenv("maxPages") ?: "10").toInt()
 
 private val visitorsLogPiwikUrl = "$piwikBaseUrl?module=API&method=Live.getLastVisitsDetails&format=JSON&idSite=1&period=day&date=today&expanded=1&token_auth=${params.piwikToken}&filter_limit=$pageSize"
-
-private val threadPool = Executors.newFixedThreadPool((System.getenv("threadPoolSize") ?: "10").toInt())
 
 private fun String.extractContentId(): String {
     val parts = this.split("/")
@@ -32,19 +30,13 @@ private fun String.extractContentId(): String {
 
 
 fun main(args: Array<String>) {
-    try {
-        println("Started at ${LocalDateTime.now()}")
-        extractRecommendations()
-        println("Finished at ${LocalDateTime.now()}")
-    } catch (e: Exception) {
-        e.printStackTrace()
-        exitProcess(1)
-    }
-    exitProcess(0)
+    println("Started at ${LocalDateTime.now()}")
+    extractRecommendations()
+    println("Finished at ${LocalDateTime.now()}")
 }
 
 fun extractRecommendations(): Map<String, MutableList<String>> {
-
+    val threadPool = Executors.newFixedThreadPool((System.getenv("threadPoolSize") ?: "10").toInt())
     val emptyResponse = objectMapper.createArrayNode()
     val futures = IntStream.rangeClosed(0, maxPages).mapToObj { page ->
         CompletableFuture.supplyAsync(Supplier {
@@ -73,7 +65,7 @@ fun extractRecommendations(): Map<String, MutableList<String>> {
     }.collect(Collectors.toList())
 
     CompletableFuture.allOf(*futures.toTypedArray()).get()
-
+    threadPool.shutdown()
     return futures.stream().map { it.join() }.extractRelations().entries.stream().collect(Collectors.toList()).associate { it.key to extractMostHit(it.value) }
 
 }
@@ -99,7 +91,7 @@ private fun Stream<ArrayNode>.extractRelations(): HashMap<String, MutableList<St
                 }
 
             }
-    //fromToIds.entries.forEach { println("${it.key} = ${it.value}") }
+    fromToIds.entries.forEach { println("${it.key} = ${it.value}") }
     return fromToIds
 }
 
