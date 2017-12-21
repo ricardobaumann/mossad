@@ -72,10 +72,10 @@ functions:
   extract:
     handler: mossad.ExtractionHandler
     timeout: 300
-    memorySize: 448
+    memorySize: 768
     environment:
-        threadPoolSize: 20
-        maxPages: 20
+        threadPoolSize: 5
+        maxPages: 45
         pageSize: 500
         apiBaseUrl: { "Fn::Join" : ["", [" https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.${self:custom.region}.amazonaws.com/${self:custom.stage}" ] ]  }
     events:
