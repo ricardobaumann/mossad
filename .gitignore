@@ -89,7 +89,7 @@ hs_err_pid*
 
 .idea/
 
-src/main/resources/
+*.json
 
 .serverless/
 node_modules/

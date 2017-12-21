@@ -6,8 +6,6 @@ import com.github.kittinunf.fuel.httpPut
 import com.github.kittinunf.result.Result
 import java.io.InputStream
 import java.io.OutputStream
-import java.util.*
-import java.util.function.Supplier
 
 class ExtractionHandler : RequestStreamHandler {
     override fun handleRequest(input: InputStream?, output: OutputStream?, context: Context?) {
