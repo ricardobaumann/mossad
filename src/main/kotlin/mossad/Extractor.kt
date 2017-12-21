@@ -30,9 +30,9 @@ private fun String.extractContentId(): String {
 
 
 fun main(args: Array<String>) {
-    println("Started at ${LocalDateTime.now()}")
+    val start = System.currentTimeMillis()
     extractRecommendations()
-    println("Finished at ${LocalDateTime.now()}")
+    println("Finished with ${System.currentTimeMillis()-start} millis")
 }
 
 fun extractRecommendations(): Map<String, MutableList<String>> {
@@ -47,7 +47,7 @@ fun extractRecommendations(): Map<String, MutableList<String>> {
                         .httpGet().timeout(60000).timeoutRead(60000).responseObject<ArrayNode>()
                 when (result) {
                     is Result.Failure -> {
-                        println("Failed to read piwik results due to ${result.error.response.statusCode}")
+                        println("Failed to read page $page due to ${result.error.response.statusCode}")
                         emptyResponse
                     }
                     is Result.Success -> {
