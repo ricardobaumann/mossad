@@ -18,7 +18,9 @@ private val pageSize = (System.getenv("pageSize") ?: "500").toInt()
 
 private val maxPages = (System.getenv("maxPages") ?: "10").toInt()
 
-private val visitorsLogPiwikUrl = "$piwikBaseUrl?module=API&method=Live.getLastVisitsDetails&format=JSON&idSite=1&period=day&date=today&expanded=1&token_auth=${params.piwikToken}&filter_limit=$pageSize"
+private val visitorsLogPiwikUrl = "$piwikBaseUrl?module=API&method=Live.getLastVisitsDetails&format=JSON" +
+        "&idSite=1&period=day&date=today&expanded=1&filter_sort_column=lastActionTimestamp&filter_sort_order=desc" +
+        "&showColumns=actionDetails&token_auth=${params.piwikToken}&filter_limit=$pageSize"
 
 private fun String.extractContentId(): String {
     val parts = this.split("/")
@@ -91,7 +93,7 @@ private fun Stream<ArrayNode>.extractRelations(): HashMap<String, MutableList<St
                 }
 
             }
-    //fromToIds.entries.forEach { println("${it.key} = ${it.value}") }
+    fromToIds.entries.forEach { println("${it.key} = ${it.value}") }
     return fromToIds
 }
 

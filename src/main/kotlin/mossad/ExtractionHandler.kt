@@ -13,6 +13,7 @@ class ExtractionHandler : RequestStreamHandler {
         val sample = results.entries.stream().findFirst()
         if (sample.isPresent) {
             println("Try sample ${sample.get()}")
+
             val (_, _, result) = "$apiBaseUrl/recommendations".httpPut().body(objectMapper.writeValueAsString(results)).response()
             when (result) {
                 is Result.Success -> {
