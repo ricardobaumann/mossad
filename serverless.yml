@@ -75,7 +75,7 @@ functions:
     memorySize: 1024
     environment:
         threadPoolSize: 5
-        maxPages: 45
+        maxPages: 43
         pageSize: 500
         apiBaseUrl: { "Fn::Join" : ["", [" https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.${self:custom.region}.amazonaws.com/${self:custom.stage}" ] ]  }
     events:
