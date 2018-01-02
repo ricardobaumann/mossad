@@ -33,12 +33,12 @@ fun main(args: Array<String>) {
 
 fun extractRecommendations(indexMode: IndexMode = IndexMode.ID): Map<String, List<String>> {
     val pageSize = (System.getenv("pageSize") ?: "500").toInt()
-    val maxPages = (System.getenv("maxPages") ?: "2").toInt()
+    val maxPages = (System.getenv("maxPages") ?: "45").toInt()
     val visitorsLogPiwikUrl = "$piwikBaseUrl?module=API&method=Live.getLastVisitsDetails&format=JSON" +
             "&idSite=1&period=day&date=today&expanded=1&filter_sort_column=lastActionTimestamp&filter_sort_order=desc" +
             "&showColumns=actionDetails,deviceType&token_auth=${params.piwikToken}&filter_limit=$pageSize"
 
-    val threadPool = Executors.newFixedThreadPool((System.getenv("threadPoolSize") ?: "10").toInt())
+    val threadPool = Executors.newFixedThreadPool((System.getenv("threadPoolSize") ?: "5").toInt())
     val futures = buildPiwikFutureCalls(maxPages, threadPool, visitorsLogPiwikUrl, 10)
 
     CompletableFuture.allOf(*futures.toTypedArray()).get()
