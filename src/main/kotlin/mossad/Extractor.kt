@@ -68,7 +68,7 @@ private fun buildPiwikFutureCalls(maxPages: Int, threadPool: ExecutorService, pi
         CompletableFuture.supplyAsync(Supplier {
             try {
                 println("Starting page $page")
-                val offset = page * pageSize
+                val offset = (page-1) * pageSize
                 val (_, _, result) = ("$piwikUrl&filter_offset=$offset")
                         .httpGet().timeout(60000).timeoutRead(60000).responseObject<ArrayNode>()
                 when (result) {
