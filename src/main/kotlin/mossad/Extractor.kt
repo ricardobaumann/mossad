@@ -64,7 +64,7 @@ private fun List<ArrayNode>.extractByIdAndDeviceRelations(): HashMap<String, Mut
 private fun buildPiwikFutureCalls(maxPages: Int, threadPool: ExecutorService?, piwikUrl: String, pageSize: Int): List<CompletableFuture<ArrayNode>> {
     val emptyResponse = objectMapper.createArrayNode()
 
-    return (0..maxPages).map { page ->
+    return (1..maxPages).map { page ->
         CompletableFuture.supplyAsync(Supplier {
             try {
                 println("Starting page $page")
@@ -111,7 +111,6 @@ private fun List<ArrayNode>.extractByIdRelations(): HashMap<String, MutableList<
                 }
 
             }
-    fromToIds.entries.forEach { println("${it.key} = ${it.value}") }
     return fromToIds
 }
 
