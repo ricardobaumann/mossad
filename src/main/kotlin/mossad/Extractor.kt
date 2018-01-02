@@ -61,8 +61,8 @@ private fun List<ArrayNode>.extractByIdAndDeviceRelations(): HashMap<String, Mut
     return fromToIds
 }
 
-private fun buildPiwikFutureCalls(maxPages: Int, threadPool: ExecutorService?, piwikUrl: String, pageSize: Int): List<CompletableFuture<ArrayNode>> {
-    val emptyResponse = objectMapper.createArrayNode()
+private fun buildPiwikFutureCalls(maxPages: Int, threadPool: ExecutorService, piwikUrl: String, pageSize: Int): List<CompletableFuture<ArrayNode>> {
+    val emptyResponse by lazy {objectMapper.createArrayNode()}
 
     return (1..maxPages).map { page ->
         CompletableFuture.supplyAsync(Supplier {
