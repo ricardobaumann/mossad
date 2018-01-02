@@ -72,7 +72,7 @@ functions:
   extract:
     handler: mossad.ExtractionHandler
     timeout: 300
-    memorySize: 768
+    memorySize: 1024
     environment:
         threadPoolSize: 5
         maxPages: 40
