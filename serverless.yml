@@ -17,6 +17,18 @@ provider:
       - ec2:DeleteNetworkInterface
     Resource: "*"
 
+  - Effect: 'Allow'
+    Action:
+      - 'lambda:InvokeFunction'
+    Resource:
+      Fn::Join:
+        - ''
+        - - 'arn:aws:'
+          - ${self:custom.region}
+          - ':'
+          - Ref: AWS::AccountId
+          - ':function:${self:service}*'
+
 package:
   artifact: build/distributions/mossad-1.0-SNAPSHOT.zip
 
@@ -45,43 +57,34 @@ functions:
               paths:
                 id: true
 
-  put:
-      handler: mossad.PutHandler
-      timeout: 30
-      memorySize: 128
-      environment:
-        redisEndpoint:
-          "Fn::GetAtt": [ServerlessElasticacheCluster, RedisEndpoint.Address]
-        redisPort:
-          "Fn::GetAtt": [ServerlessElasticacheCluster, RedisEndpoint.Port]
-
-      vpc:
-        securityGroupIds:
-          - "Fn::GetAtt": ServerlessSecurityGroup.GroupId
-        subnetIds:
-          - Ref: ServerlessSubnet
-      events:
-        - http:
-            path: recommendations
-            method: put
-            request:
-              parameters:
-                paths:
-                  id: true
+  url-reader:
+      handler: mossad.UrlReader
+      timeout: 100
+      memorySize: 248
 
   extract:
     handler: mossad.ExtractionHandler
     timeout: 300
     memorySize: 1024
     environment:
+        redisEndpoint:
+          "Fn::GetAtt": [ServerlessElasticacheCluster, RedisEndpoint.Address]
+        redisPort:
+          "Fn::GetAtt": [ServerlessElasticacheCluster, RedisEndpoint.Port]
         threadPoolSize: 5
         maxPages: 43
         pageSize: 500
-        apiBaseUrl: { "Fn::Join" : ["", [" https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.${self:custom.region}.amazonaws.com/${self:custom.stage}" ] ]  }
+        #arn:aws:lambda:eu-west-1:933782373565:function:mossad-dev-extract
+        urlReaderLambdaArn: { "Fn::Join" : ["", ["arn:aws:${self:custom.region}:", { "Ref" : "AWS::AccountId" }, ":function:${self:service}-${self:custom.stage}-url-reader" ]]  }
     events:
       - schedule:
          rate: rate(1 hour)
          enabled: false
+    vpc:
+      securityGroupIds:
+        - "Fn::GetAtt": ServerlessSecurityGroup.GroupId
+      subnetIds:
+        - Ref: ServerlessSubnet
 
 
 resources:
