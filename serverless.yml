@@ -23,7 +23,7 @@ provider:
     Resource:
       Fn::Join:
         - ''
-        - - 'arn:aws:'
+        - - 'arn:aws:lambda:'
           - ${self:custom.region}
           - ':'
           - Ref: AWS::AccountId
@@ -74,17 +74,12 @@ functions:
         threadPoolSize: 5
         maxPages: 43
         pageSize: 500
-        #arn:aws:lambda:eu-west-1:933782373565:function:mossad-dev-extract
-        urlReaderLambdaArn: { "Fn::Join" : ["", ["arn:aws:${self:custom.region}:", { "Ref" : "AWS::AccountId" }, ":function:${self:service}-${self:custom.stage}-url-reader" ]]  }
+        urlReaderFunctionName: "${self:service}-${self:custom.stage}-url-reader"
+        region: "${self:custom.region}"
     events:
       - schedule:
          rate: rate(1 hour)
          enabled: false
-    vpc:
-      securityGroupIds:
-        - "Fn::GetAtt": ServerlessSecurityGroup.GroupId
-      subnetIds:
-        - Ref: ServerlessSubnet
 
 
 resources:

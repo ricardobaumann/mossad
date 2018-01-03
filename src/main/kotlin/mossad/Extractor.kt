@@ -9,6 +9,11 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.function.Supplier
 import kotlin.collections.HashMap
+import com.amazonaws.regions.Regions
+import com.amazonaws.services.lambda.AWSLambdaAsyncClient
+import com.amazonaws.services.lambda.AWSLambdaAsyncClientBuilder
+import com.amazonaws.services.lambda.model.InvokeRequest
+
 
 enum class IndexMode {
     ID, ID_AND_DEVICE
@@ -63,29 +68,24 @@ private fun List<ArrayNode>.extractByIdAndDeviceRelations(): HashMap<String, Mut
 
 private fun buildPiwikFutureCalls(maxPages: Int, threadPool: ExecutorService, piwikUrl: String, pageSize: Int): List<CompletableFuture<ArrayNode>> {
     val emptyResponse by lazy {objectMapper.createArrayNode()}
-
+    val functionName = System.getenv("urlReaderFunctionName")?: throw RuntimeException("Url Reader Lambda name not set")
+    val region = System.getenv("region")?: throw RuntimeException("Lambda region not set")
+    val client = AWSLambdaAsyncClientBuilder.standard().withRegion(region).build()
     return (1..maxPages).map { page ->
         CompletableFuture.supplyAsync(Supplier {
-            try {
-                println("Starting page $page")
-                val offset = (page-1) * pageSize
-                val (_, _, result) = ("$piwikUrl&filter_offset=$offset")
-                        .httpGet().timeout(60000).timeoutRead(60000).responseObject<ArrayNode>()
-                when (result) {
-                    is Result.Failure -> {
-                        println("Failed to read page $page due to ${result.error.response.statusCode}")
-                        emptyResponse
-                    }
-                    is Result.Success -> {
-                        println("Page $page processed successfully")
-                        result.get()
-                    }
+                try {
+                    println("Starting page $page")
+                    val offset = (page-1) * pageSize
+                    val url = "$piwikUrl&filter_offset=$offset"
+                    println("Sending request to $functionName with $url")
+                    val invokeRequest = InvokeRequest().withFunctionName(functionName).withPayload(objectMapper.writeValueAsString(UrlRequest(url)))
+                    val lambdaResult = client.invoke(invokeRequest)
+                    println("Page $page processed successfully")
+                    objectMapper.readTree(String(lambdaResult.payload.array())) as ArrayNode
+                } catch (e:Throwable) {
+                    println("Unable to parse result from page $page due to $e")
+                    emptyResponse
                 }
-            } catch (e: Exception) {
-                println("Failed to process page $page: $e")
-                emptyResponse
-            }
-
         }, threadPool)
 
     }
