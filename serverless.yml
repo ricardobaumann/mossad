@@ -89,9 +89,6 @@ functions:
     timeout: 300
     memorySize: 248
     environment:
-        threadPoolSize: 5
-        maxPages: 43
-        pageSize: 500
         apiBaseUrl: { "Fn::Join" : ["", [" https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.${self:custom.region}.amazonaws.com/${self:custom.stage}" ] ]  }
         region: "${self:custom.region}"
         functionName: "${self:custom.service}-${self:custom.stage}-extract"
