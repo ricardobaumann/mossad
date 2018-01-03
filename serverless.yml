@@ -19,6 +19,19 @@ provider:
       - ec2:DeleteNetworkInterface
     Resource: "*"
 
+  - Effect: 'Allow'
+    Action:
+      - 'lambda:InvokeFunction'
+    Resource:
+      Fn::Join:
+        - ''
+        - - 'arn:aws:lambda:'
+          - ${self:custom.region}
+          - ':'
+          - Ref: AWS::AccountId
+          - ':function:${self:service}*'
+
+
 package:
   artifact: build/distributions/mossad-1.0-SNAPSHOT.zip
 
@@ -74,14 +87,14 @@ functions:
   extract:
     handler: mossad.ExtractionHandler
     timeout: 300
-    memorySize: 1024
+    memorySize: 248
     environment:
         threadPoolSize: 5
         maxPages: 43
         pageSize: 500
         apiBaseUrl: { "Fn::Join" : ["", [" https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.${self:custom.region}.amazonaws.com/${self:custom.stage}" ] ]  }
         region: "${self:custom.region}"
-        functionName: "${self:custom.service}-${self:custom.region}-extract"
+        functionName: "${self:custom.service}-${self:custom.stage}-extract"
     events:
       - schedule:
          rate: rate(1 hour)

@@ -7,12 +7,11 @@ import com.amazonaws.services.lambda.runtime.RequestStreamHandler
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.kittinunf.fuel.httpPut
 import com.github.kittinunf.result.Result
-import org.apache.http.entity.ContentType.getOrDefault
 import java.io.InputStream
 import java.io.OutputStream
 
 data class ExtractionContext(val currentPage:Int = 1,
-                             val maxPages:Int = 40,
+                             val maxPages:Int = 100,
                              val pageSize:Int = 500,
                              val threadPoolSize: Int = 5,
                              val maxPagesPerCall: Int = 10,
@@ -22,7 +21,7 @@ data class ExtractionContext(val currentPage:Int = 1,
 class ExtractionHandler : RequestStreamHandler {
     override fun handleRequest(input: InputStream?, output: OutputStream?, context: Context?) {
         val extractionContext = try { objectMapper.readValue<ExtractionContext>(input!!) } catch (e: Exception) {ExtractionContext()}
-        println("Extraction context: $extractionContext")
+        println("Processing context: ${extractionContext.currentPage}")
         if (extractionContext.currentPage > extractionContext.maxPages) {
             val sample = extractionContext.resultsSoFar.entries.first()
                 println("Try sample $sample")
@@ -49,9 +48,7 @@ class ExtractionHandler : RequestStreamHandler {
                     extractionContext.resultsSoFar.toMutableMap().apply { results.forEach { k, v -> put(k,getOrDefault(k, listOf()).plus(v)) } })
             val client = AWSLambdaAsyncClientBuilder.standard().withRegion(System.getenv("region")).build()
             val invokeRequest = InvokeRequest().withPayload(objectMapper.writeValueAsString(nextContext)).withFunctionName(System.getenv("functionName"))
-            println("forwarding $nextContext")
-            val result = client.invokeAsync(invokeRequest)
-            Thread(Runnable { result.get() }).start()
+            try {client.invoke(invokeRequest)} catch (e: Exception) {println("Failed to wait, but dont worry!")}
         }
 
 
