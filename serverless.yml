@@ -57,6 +57,30 @@ functions:
               paths:
                 id: true
 
+  put:
+    handler: mossad.PutHandler
+    timeout: 30
+    memorySize: 128
+    environment:
+      redisEndpoint:
+        "Fn::GetAtt": [ServerlessElasticacheCluster, RedisEndpoint.Address]
+      redisPort:
+        "Fn::GetAtt": [ServerlessElasticacheCluster, RedisEndpoint.Port]
+
+    vpc:
+      securityGroupIds:
+        - "Fn::GetAtt": ServerlessSecurityGroup.GroupId
+      subnetIds:
+        - Ref: ServerlessSubnet
+    events:
+      - http:
+          path: recommendations
+          method: put
+          request:
+            parameters:
+              paths:
+                id: true
+
   url-reader:
       handler: mossad.UrlReader
       timeout: 100
@@ -67,13 +91,10 @@ functions:
     timeout: 300
     memorySize: 1024
     environment:
-        redisEndpoint:
-          "Fn::GetAtt": [ServerlessElasticacheCluster, RedisEndpoint.Address]
-        redisPort:
-          "Fn::GetAtt": [ServerlessElasticacheCluster, RedisEndpoint.Port]
         threadPoolSize: 5
         maxPages: 43
         pageSize: 500
+        apiBaseUrl: { "Fn::Join" : ["", [" https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.${self:custom.region}.amazonaws.com/${self:custom.stage}" ] ]  }
         urlReaderFunctionName: "${self:service}-${self:custom.stage}-url-reader"
         region: "${self:custom.region}"
     events:
