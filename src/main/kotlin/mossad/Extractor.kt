@@ -26,26 +26,26 @@ private fun String.asArticleId(): String {
 
 fun main(args: Array<String>) {
     val start = System.currentTimeMillis()
-    val result = extractRecommendations()
+    val result = extractRecommendations(ExtractionContext())
     result.entries.forEach { println("${it.key} = ${it.value}") }
     println("Finished with ${System.currentTimeMillis()-start} millis")
 }
 
-fun extractRecommendations(indexMode: IndexMode = IndexMode.ID): Map<String, List<String>> {
-    val pageSize = (System.getenv("pageSize") ?: "500").toInt()
-    val maxPages = (System.getenv("maxPages") ?: "45").toInt()
+fun extractRecommendations(extractionContext: ExtractionContext): Map<String, List<String>> {
+    val pageSize = extractionContext.pageSize
+    val maxPages = extractionContext.maxPagesPerCall
     val visitorsLogPiwikUrl = "$piwikBaseUrl?module=API&method=Live.getLastVisitsDetails&format=JSON" +
             "&idSite=1&period=day&date=today&expanded=1&filter_sort_column=lastActionTimestamp&filter_sort_order=desc" +
             "&showColumns=actionDetails,deviceType&token_auth=${params.piwikToken}&filter_limit=$pageSize"
 
-    val threadPool = Executors.newFixedThreadPool((System.getenv("threadPoolSize") ?: "5").toInt())
-    val futures = buildPiwikFutureCalls(maxPages, threadPool, visitorsLogPiwikUrl, pageSize)
+    val threadPool = Executors.newFixedThreadPool(extractionContext.threadPoolSize)
+    val futures = buildPiwikFutureCalls(extractionContext.currentPage, maxPages, threadPool, visitorsLogPiwikUrl, pageSize)
 
     CompletableFuture.allOf(*futures.toTypedArray()).get()
     threadPool.shutdown()
     val results = futures.map { it.join() }
-    val map = if (indexMode == IndexMode.ID) results.extractByIdRelations() else results.extractByIdAndDeviceRelations()
-    return map.entries.associate { it.key to extractMostHit(it.value) }
+    return if (extractionContext.indexMode == IndexMode.ID) results.extractByIdRelations() else results.extractByIdAndDeviceRelations()
+    //return map.entries.associate { it.key to extractMostHit(it.value) }
 
 }
 
@@ -61,10 +61,10 @@ private fun List<ArrayNode>.extractByIdAndDeviceRelations(): HashMap<String, Mut
     return fromToIds
 }
 
-private fun buildPiwikFutureCalls(maxPages: Int, threadPool: ExecutorService, piwikUrl: String, pageSize: Int): List<CompletableFuture<ArrayNode>> {
+private fun buildPiwikFutureCalls(currentPage: Int, maxPages: Int, threadPool: ExecutorService, piwikUrl: String, pageSize: Int): List<CompletableFuture<ArrayNode>> {
     val emptyResponse by lazy {objectMapper.createArrayNode()}
 
-    return (1..maxPages).map { page ->
+    return (currentPage..maxPages).map { page ->
         CompletableFuture.supplyAsync(Supplier {
             try {
                 println("Starting page $page")
@@ -112,12 +112,4 @@ private fun List<ArrayNode>.extractByIdRelations(): HashMap<String, MutableList<
 
             }
     return fromToIds
-}
-
-fun extractMostHit(inputList: List<String>): List<String> {
-    return inputList.groupingBy { it }.eachCount()
-            .entries.sortedBy { it.value }.reversed()
-            .take(10)
-            .map { it.key }
-
 }

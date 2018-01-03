@@ -3,6 +3,8 @@ service: mossad
 custom:
   stage: ${opt:stage, self:provider.stage}
   region: ${opt:region, self:provider.region}
+  service: ${opt:service, self:service}
+
 
 provider:
   name: aws
@@ -78,6 +80,8 @@ functions:
         maxPages: 43
         pageSize: 500
         apiBaseUrl: { "Fn::Join" : ["", [" https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.${self:custom.region}.amazonaws.com/${self:custom.stage}" ] ]  }
+        region: "${self:custom.region}"
+        functionName: "${self:custom.service}-${self:custom.region}-extract"
     events:
       - schedule:
          rate: rate(1 hour)
