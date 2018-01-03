@@ -39,7 +39,7 @@ fun extractRecommendations(indexMode: IndexMode = IndexMode.ID): Map<String, Lis
             "&showColumns=actionDetails,deviceType&token_auth=${params.piwikToken}&filter_limit=$pageSize"
 
     val threadPool = Executors.newFixedThreadPool((System.getenv("threadPoolSize") ?: "5").toInt())
-    val futures = buildPiwikFutureCalls(maxPages, threadPool, visitorsLogPiwikUrl, 10)
+    val futures = buildPiwikFutureCalls(maxPages, threadPool, visitorsLogPiwikUrl, pageSize)
 
     CompletableFuture.allOf(*futures.toTypedArray()).get()
     threadPool.shutdown()
