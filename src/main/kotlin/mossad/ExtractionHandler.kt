@@ -39,13 +39,9 @@ class ExtractionHandler : RequestStreamHandler {
 
         } else {
             val results = extractRecommendations(extractionContext)
-            val nextContext = ExtractionContext(extractionContext.currentPage+extractionContext.maxPagesPerCall,
-                    extractionContext.maxPages,
-                    extractionContext.pageSize,
-                    extractionContext.threadPoolSize,
-                    extractionContext.maxPagesPerCall,
-                    extractionContext.indexMode,
-                    extractionContext.resultsSoFar.toMutableMap().apply { results.forEach { k, v -> put(k,getOrDefault(k, listOf()).plus(v)) } })
+            val nextContext = extractionContext.copy(
+                    currentPage = extractionContext.currentPage+extractionContext.maxPagesPerCall,
+                    resultsSoFar = extractionContext.resultsSoFar.toMutableMap().apply { results.forEach { k, v -> put(k,getOrDefault(k, listOf()).plus(v)) } })
             val client = AWSLambdaAsyncClientBuilder.standard().withRegion(System.getenv("region")).build()
             val invokeRequest = InvokeRequest().withPayload(objectMapper.writeValueAsString(nextContext)).withFunctionName(System.getenv("functionName"))
             try {client.invoke(invokeRequest)} catch (e: Exception) {println("Failed to wait, but dont worry!")}
