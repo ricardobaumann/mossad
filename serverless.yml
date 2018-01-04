@@ -80,8 +80,8 @@ functions:
         apiBaseUrl: { "Fn::Join" : ["", [" https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.${self:custom.region}.amazonaws.com/${self:custom.stage}" ] ]  }
     events:
       - schedule:
-         rate: rate(1 hour)
-         enabled: false
+         rate: rate(15 minutes)
+         enabled: true
 
 
 resources:
