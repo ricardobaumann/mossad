@@ -1,4 +1,4 @@
-service: gossad
+service: mossad
 
 custom:
   stage: ${opt:stage, self:provider.stage}
@@ -67,7 +67,7 @@ resources:
         Tags:
            -
               Key: "name"
-              Value: "gossad_test_vpc"
+              Value: "mossad_vpc"
 
     ServerlessSubnet:
       DependsOn: ServerlessVPC
@@ -100,7 +100,7 @@ resources:
     ServerlessElasticacheSubnetGroup:
       Type: AWS::ElastiCache::SubnetGroup
       Properties:
-        Description: "Cache Gossad Subnet Group"
+        Description: "Cache Subnet Group"
         SubnetIds:
         - Ref: ServerlessSubnet
     ServerlessElasticacheCluster:
