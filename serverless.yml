@@ -1,4 +1,4 @@
-service: mossad
+service: gossad
 
 custom:
   stage: ${opt:stage, self:provider.stage}
@@ -6,7 +6,7 @@ custom:
 
 provider:
   name: aws
-  runtime: java8
+  runtime: python2.7
   region: eu-west-1
 
   iamRoleStatements:
@@ -18,13 +18,11 @@ provider:
     Resource: "*"
 
 package:
-  artifact: build/distributions/mossad-1.0-SNAPSHOT.zip
+  artifact: handler.zip
 
 functions:
-  get:
-    handler: mossad.GetHandler
-    timeout: 30
-    memorySize: 128
+  endpoint:
+    handler: handler.Handle
     environment:
       redisEndpoint:
         "Fn::GetAtt": [ServerlessElasticacheCluster, RedisEndpoint.Address]
@@ -39,49 +37,25 @@ functions:
     events:
       - http:
           path: recommendations/{id}
-          method: get
+          method: any
           request:
             parameters:
               paths:
                 id: true
 
-  put:
-      handler: mossad.PutHandler
-      timeout: 30
-      memorySize: 128
-      environment:
-        redisEndpoint:
-          "Fn::GetAtt": [ServerlessElasticacheCluster, RedisEndpoint.Address]
-        redisPort:
-          "Fn::GetAtt": [ServerlessElasticacheCluster, RedisEndpoint.Port]
-
-      vpc:
-        securityGroupIds:
-          - "Fn::GetAtt": ServerlessSecurityGroup.GroupId
-        subnetIds:
-          - Ref: ServerlessSubnet
-      events:
-        - http:
-            path: recommendations
-            method: put
-            request:
-              parameters:
-                paths:
-                  id: true
-
   extract:
-    handler: mossad.ExtractionHandler
+    handler: handler.HandleExtract
     timeout: 300
-    memorySize: 1024
     environment:
-        threadPoolSize: 5
-        maxPages: 43
-        pageSize: 500
-        apiBaseUrl: { "Fn::Join" : ["", [" https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.${self:custom.region}.amazonaws.com/${self:custom.stage}" ] ]  }
+        apiBaseUrl: { "Fn::Join" : ["", ["https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.${self:custom.region}.amazonaws.com/${self:custom.stage}" ] ]  }
+        limitPerContentId: 10
+        limitPerPage: 500
+        maxPages: 40
+        throughput: 5
     events:
       - schedule:
          rate: rate(15 minutes)
-         enabled: true
+         enabled: false
 
 
 resources:
@@ -93,7 +67,7 @@ resources:
         Tags:
            -
               Key: "name"
-              Value: "mossad_vpc"
+              Value: "gossad_test_vpc"
 
     ServerlessSubnet:
       DependsOn: ServerlessVPC
@@ -126,7 +100,7 @@ resources:
     ServerlessElasticacheSubnetGroup:
       Type: AWS::ElastiCache::SubnetGroup
       Properties:
-        Description: "Cache Subnet Group"
+        Description: "Cache Gossad Subnet Group"
         SubnetIds:
         - Ref: ServerlessSubnet
     ServerlessElasticacheCluster:
